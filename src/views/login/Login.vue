@@ -2,7 +2,7 @@
   <div class="page-login">
     <div class="login-container">
       <div class="logo">
-        <img src="./statics/logo.png" alt="Logo" />
+        <img src="../../assets/logo.png" alt="Logo" />
         <div class="name">
           <span v-for="text in app.info.name" :key="text">{{ text }}</span>
         </div>
@@ -56,6 +56,7 @@
 import { ref, reactive } from 'vue'
 import { ElMessage } from 'element-plus'
 import router from '../../router/index'
+import { login } from '../../services/index.ts'
 
 const app = {
   info: {
@@ -75,14 +76,20 @@ const toLogin = () => {
   if (!form.password) {
     return ElMessage.error('请输入密码')
   }
+  
   // TODO: 登录
-  saving.value = true
-
-  setTimeout(() => {
-    localStorage.setItem('isAuthenticated', JSON.stringify('true'))
-    saving.value = false
-    router.push('/')
-  }, 1000)
+  saving.value = true;
+  login.login(form).then(res => {
+    saving.value = false;
+    if(res.code === 200) {
+      localStorage.setItem('isAuthenticated', 'true')
+      router.push('/')
+    }
+    return ElMessage.success(res.message);
+  }, err=> {
+    saving.value = false;
+    return ElMessage.error(err.message);
+  });
 }
 </script>
 <style lang="scss" scoped>

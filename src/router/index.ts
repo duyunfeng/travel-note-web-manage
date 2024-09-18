@@ -1,19 +1,32 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+const route = [
+  {
+    path: '/',
+    name: 'home',
+    component: () => import('@/views/home/Home.vue'),
+    children: [
+      {
+        path: '/personal',
+        name: 'personal',
+        component: () => import('@/views/personal/Personal.vue')
+      },
+      {
+        path: '/user',
+        name: 'user',
+        component: () => import('@/views/user/User.vue')
+      }
+    ]
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/login/Login.vue')
+  }
+]
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    {
-      path: '/',
-      name: 'home',
-      component: () => import('@/views/home/Home.vue')
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/views/login/Login.vue')
-    }
-  ]
+  routes: route,
 })
 
 router.beforeEach((to, from) => {

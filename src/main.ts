@@ -2,12 +2,12 @@ import './assets/main.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { registerElements } from './components/registerElements'
+import { initElements } from './components'
 import App from './App.vue'
 import router from './router'
 
 const app = createApp(App)
-registerElements(app)
+initElements(app);
 app.use(createPinia())
 app.use(router)
 

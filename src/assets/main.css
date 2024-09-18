@@ -27,3 +27,26 @@
     transform: rotate(-0.28deg);
   }
 }
+
+.mr5 {
+  margin-right: 5px;
+}
+
+.ml5 {
+  margin-left: 5px;
+}
+.ml15 {
+  margin-left: 15px;
+}
+
+.mt20 {
+  margin-top: 20px;
+}
+
+.wd200 {
+  width: 200px;
+}
+
+.fr {
+  float: right;
+}

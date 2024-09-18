@@ -1,17 +1,39 @@
 import 'element-plus/dist/index.css'
-import { ElButton, ElMenu, ElMenuItem, ElConfigProvider, ElForm, ElFormItem } from 'element-plus'
+import { ElButton, ElMenu, ElMenuItem, ElConfigProvider, ElForm, ElFormItem, ElSubMenu, ElSwitch, ElRow, ElCol, ElMenuItemGroup, ElIcon, ElInput, ElRadioGroup, ElRadioButton, ElDatePicker, ElAvatar, ElSelect, ElOption, ElTable, ElTableColumn } from 'element-plus'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const components = {
   ElButton,
   ElMenu,
   ElMenuItem,
-  ElConfigProvider,
+  ElSubMenu,
+  ElSwitch,
+  ElRow,
+  ElCol,
+  ElMenuItemGroup,
+  ElIcon,
   ElForm,
+  ElInput,
+  ElRadioGroup,
+  ElRadioButton,
+  ElDatePicker,
+  ElAvatar,
+  ElSelect,
+  ElOption,
+  ElTable,
+  ElTableColumn,
+  ElConfigProvider,
   ElFormItem
 }
 
 export const registerElements = (app: any) => {
   for (const component in components) {
     app.component(component, components[component])
+  }
+}
+
+export const registerElementIcons = (app: any) => {
+  for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+    app.component(key, component)
   }
 }
