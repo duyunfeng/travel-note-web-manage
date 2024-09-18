@@ -1,5 +1,29 @@
 import 'element-plus/dist/index.css'
-import { ElButton, ElMenu, ElMenuItem, ElConfigProvider, ElForm, ElFormItem, ElSubMenu, ElSwitch, ElRow, ElCol, ElMenuItemGroup, ElIcon, ElInput, ElRadioGroup, ElRadioButton, ElDatePicker, ElAvatar, ElSelect, ElOption, ElTable, ElTableColumn } from 'element-plus'
+import {
+  ElButton,
+  ElMenu,
+  ElMenuItem,
+  ElConfigProvider,
+  ElForm,
+  ElFormItem,
+  ElSubMenu,
+  ElSwitch,
+  ElRow,
+  ElCol,
+  ElMenuItemGroup,
+  ElIcon,
+  ElInput,
+  ElRadioGroup,
+  ElRadioButton,
+  ElDatePicker,
+  ElAvatar,
+  ElSelect,
+  ElOption,
+  ElTable,
+  ElTableColumn,
+  ElDrawer,
+  ElRadio
+} from 'element-plus'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 const components = {
@@ -22,6 +46,8 @@ const components = {
   ElOption,
   ElTable,
   ElTableColumn,
+  ElDrawer,
+  ElRadio,
   ElConfigProvider,
   ElFormItem
 }

@@ -76,20 +76,23 @@ const toLogin = () => {
   if (!form.password) {
     return ElMessage.error('请输入密码')
   }
-  
+
   // TODO: 登录
-  saving.value = true;
-  login.login(form).then(res => {
-    saving.value = false;
-    if(res.code === 200) {
-      localStorage.setItem('isAuthenticated', 'true')
-      router.push('/')
+  saving.value = true
+  login.login(form).then(
+    (res) => {
+      saving.value = false
+      if (res.code === 200) {
+        localStorage.setItem('isAuthenticated', 'true')
+        router.push('/')
+      }
+      return ElMessage.success(res.message)
+    },
+    (err) => {
+      saving.value = false
+      return ElMessage.error(err.message)
     }
-    return ElMessage.success(res.message);
-  }, err=> {
-    saving.value = false;
-    return ElMessage.error(err.message);
-  });
+  )
 }
 </script>
 <style lang="scss" scoped>
