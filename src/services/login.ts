@@ -6,7 +6,7 @@ const login = (data: User) => {
 }
 
 const getUser = (data: any) => {
-    return get('/', data)
+    return get('/login/getUser', data)
 }
 
 export { login, getUser };

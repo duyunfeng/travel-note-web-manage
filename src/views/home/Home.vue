@@ -1,18 +1,18 @@
 <template>
-  <el-menu class="el-menu" mode="horizontal" :ellipsis="false" @select="handleSelect">
+  <el-menu class="el-menu" mode="horizontal" :ellipsis="false">
     <el-menu-item index="0">
       <img class="logo" src="../../assets/logo.png" alt="Logo" />
     </el-menu-item>
     <el-menu-item index="1">黑暗模式 <el-switch class="ml5" v-model="model" /></el-menu-item>
     <el-sub-menu index="2">
       <template #title>{{ username }}</template>
-      <el-menu-item v-for="(item, key) in menus" :index="getIndex(key)" :key="key">
+      <el-menu-item v-for="(item, key) in menus" :index="getIndex(key)" :key="key" @click="userClick(key)">
         {{ item.name }}
       </el-menu-item>
     </el-sub-menu>
   </el-menu>
   <el-row class="mt20">
-    <el-col :span="3">
+    <el-col :span="4" class="left">
       <el-menu class="el-menu-vertical" router="true">
         <el-sub-menu index="1">
           <template #title>
@@ -53,7 +53,7 @@
         </el-menu-item>
       </el-menu>
     </el-col>
-    <el-col :span="18">
+    <el-col :span="18" class="right">
       <router-view />
     </el-col>
   </el-row>
@@ -72,6 +72,12 @@ const menus = ref([
   { name: '系统设置', path: '/setting' },
   { name: '退出登录', path: '/logout' }
 ])
+const userClick = (key: number) => {
+  if (key === 3) {
+    localStorage.removeItem('isAuthenticated')
+    router.push('/login')
+  }
+}
 </script>
 <style scoped>
 .el-menu--horizontal > .el-menu-item:nth-child(1) {
@@ -83,6 +89,12 @@ const menus = ref([
   background-color: #2c3142;
   border-radius: 50px;
   border: 3px solid #2c3142;
+}
+.left {
+  min-width: 200px;
+}
+.right {
+  min-width: 400px;
 }
 
 .el-menu-vertical {

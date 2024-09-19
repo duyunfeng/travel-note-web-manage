@@ -21,8 +21,10 @@ import {
   ElOption,
   ElTable,
   ElTableColumn,
+  ElDialog,
   ElDrawer,
-  ElRadio
+  ElRadio,
+  ElPopconfirm
 } from 'element-plus'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
@@ -46,6 +48,8 @@ const components = {
   ElOption,
   ElTable,
   ElTableColumn,
+  ElDialog,
+  ElPopconfirm,
   ElDrawer,
   ElRadio,
   ElConfigProvider,

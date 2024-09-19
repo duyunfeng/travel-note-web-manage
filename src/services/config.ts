@@ -4,6 +4,7 @@ const instance = axios.create({
   timeout: 5000
 });
 
+
 instance.interceptors.response.use(
   (req) => {
     return req.data;
@@ -22,8 +23,12 @@ const post = (url: string, data: any) => {
   return instance.post(url, data);
 };
 
+const put = (url: string, data: any) => {
+  return instance.put(url, data);
+};
+
 const remove = (url: string) => {
   return instance.delete(url);
 };
 
-export { get, post, remove };
+export { get, post, put, remove };

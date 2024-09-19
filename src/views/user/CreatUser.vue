@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="props.isOpen" direction="rtl" :before-close="handleClick">
+  <el-drawer v-model="props.isOpen" direction="rtl" :before-close="cannelClick">
     <template #header>
       <h4>{{ props.title }}</h4>
     </template>
@@ -14,6 +14,16 @@
         >
           <el-form-item label="账号:" prop="userName">
             <el-input style="width: 225px" v-model="form.userName" />
+          </el-form-item>
+          <el-form-item label="角色:">
+            <el-select style="width: 225px" v-model="form.userRole">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="密码:" prop="password">
             <el-input style="width: 225px" type="password" v-model="form.password" />
@@ -36,12 +46,16 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 const props = defineProps({
   isOpen: Boolean,
   title: String
 });
+const options = [
+  { value: 'operator', label: '操作员' },
+  { value: 'user', label: '普通用户' }
+];
 const payload = {
   isCreat: false,
   form: null
@@ -52,12 +66,14 @@ interface RuleForm {
   password: string;
   checkPass: string;
   name: string;
+  userRole: string;
 }
 const form = reactive<RuleForm>({
   userName: '',
   password: '',
   checkPass: '',
-  name: ''
+  name: '',
+  userRole: ''
 });
 const validatePass = (rule: any, value: any, callback: any) => {
   if (value === '') {
@@ -88,13 +104,14 @@ const rules = reactive<FormRules<typeof form>>({
   password: [{ validator: validatePass, trigger: 'blur' }],
   checkPass: [{ validator: validatePass2, trigger: 'blur' }]
 });
-const emit = defineEmits(['close']);
 
+const emit = defineEmits(['close']);
 const reset = () => {
   form.name = '';
   form.userName = '';
   form.password = '';
   form.checkPass = '';
+  form.userRole = '';
 };
 const cannelClick = () => {
   payload.isCreat = false;
@@ -109,11 +126,5 @@ const confirmClick = () => {
   if (!props.isOpen) {
     reset();
   }
-};
-
-const handleClick = () => {
-  payload.isCreat = false;
-  reset();
-  emit('close', payload);
 };
 </script>

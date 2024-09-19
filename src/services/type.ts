@@ -1,5 +1,5 @@
 declare type User = {
-    username: string,
+    userName: string,
     password: string
 }
 

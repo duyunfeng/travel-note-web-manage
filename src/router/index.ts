@@ -30,8 +30,7 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from) => {
-  const isAuthenticated = JSON.parse(localStorage.getItem('isAuthenticated') || 'false')
-  console.log(isAuthenticated)
+  const isAuthenticated = localStorage.getItem('isAuthenticated')??'false';
   if (
     // 检查用户是否已登录
     isAuthenticated === 'false' &&
@@ -41,9 +40,9 @@ router.beforeEach((to, from) => {
     return { name: 'login' }
   } else if (
     // 检查用户是否已登录
-    isAuthenticated === 'true' &&
+    isAuthenticated === 'true' && 
     // ❗️ 避免无限重定向
-    to.name !== 'home'
+    to.name === 'login'
   ) {
     return { name: 'home' }
   }

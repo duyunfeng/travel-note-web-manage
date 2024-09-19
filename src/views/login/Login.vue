@@ -14,7 +14,7 @@
         <el-form label-position="top" class="login-form" :disabled="saving">
           <el-form-item label="用户名">
             <input
-              v-model="form.username"
+              v-model="form.userName"
               placeholder="请输入用户名"
               maxlength="20"
               type="text"
@@ -53,50 +53,57 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
-import { ElMessage } from 'element-plus'
-import router from '../../router/index'
-import { login } from '../../services/index.ts'
+import { ref, reactive } from 'vue';
+import { ElMessage } from 'element-plus';
+import router from '../../router/index';
+import { login, user } from '../../services/index.ts';
 
 const app = {
   info: {
     name: ['A', 'D', 'M', 'I', 'N']
   }
-}
-const saving = ref(false)
-const readonly = ref(true)
+};
+const saving = ref(false);
+const readonly = ref(true);
 const form = reactive({
-  username: '',
+  userName: '',
   password: ''
-})
+});
 const toLogin = () => {
-  if (!form.username) {
-    return ElMessage.error('请输入用户名')
+  if (!form.userName) {
+    return ElMessage.error('请输入用户名');
   }
   if (!form.password) {
-    return ElMessage.error('请输入密码')
+    return ElMessage.error('请输入密码');
   }
 
   // TODO: 登录
-  saving.value = true
+  saving.value = true;
   login.login(form).then(
     (res) => {
-      saving.value = false
+      saving.value = false;
       if (res.code === 200) {
-        localStorage.setItem('isAuthenticated', 'true')
-        router.push('/')
+        user.getUser({userName: form.userName}).then(
+          (res) => {
+            router.push('/');
+            localStorage.setItem('isAuthenticated', 'true');
+            localStorage.setItem('user', JSON.stringify(res.data));
+          },
+          (err) => ElMessage.error(err.message)
+        );
       }
-      return ElMessage.success(res.message)
+      return ElMessage.success(res.message);
     },
     (err) => {
-      saving.value = false
-      return ElMessage.error(err.message)
+      saving.value = false;
+      return ElMessage.error(err.message);
     }
-  )
-}
+  );
+};
 </script>
 <style lang="scss" scoped>
 $color: #2c3142;
+
 .page-login {
   display: flex;
   justify-content: center;
@@ -106,6 +113,7 @@ $color: #2c3142;
   position: relative;
   background-color: #fff;
   color: $color;
+
   .bg {
     position: absolute;
     left: 0;
@@ -115,6 +123,7 @@ $color: #2c3142;
     pointer-events: none;
     transform: rotate(180deg) scaleY(-1);
   }
+
   .login-container {
     display: flex;
     flex-direction: column;
