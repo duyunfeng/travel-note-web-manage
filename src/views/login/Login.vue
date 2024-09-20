@@ -80,11 +80,11 @@ const toLogin = () => {
   // TODO: 登录
   saving.value = true;
   login.login(form).then(
-    (res) => {
+    (res: any) => {
       saving.value = false;
       if (res.code === 200) {
-        user.getUser({userName: form.userName}).then(
-          (res) => {
+        user.getUser({ userName: form.userName }).then(
+          (res: any) => {
             router.push('/');
             localStorage.setItem('isAuthenticated', 'true');
             localStorage.setItem('user', JSON.stringify(res.data));

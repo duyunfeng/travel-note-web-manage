@@ -13,7 +13,7 @@
   </el-menu>
   <el-row class="mt20">
     <el-col :span="4" class="left">
-      <el-menu class="el-menu-vertical" router="true">
+      <el-menu class="el-menu-vertical" router>
         <el-sub-menu index="1">
           <template #title>
             <el-icon :size="18"><location /></el-icon>
@@ -64,7 +64,7 @@ import router from '../../router/index'
 
 const model = ref(false)
 const username = ref('管理员')
-const getIndex = (key) => `2-${key + 1}`
+const getIndex = (key:number) => `2-${key + 1}`
 
 const menus = ref([
   { name: '个人中心', path: '/user' },
