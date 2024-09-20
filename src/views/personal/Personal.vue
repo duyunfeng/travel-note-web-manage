@@ -50,7 +50,6 @@ const form = reactive({
 })
 let personalData = reactive([])
 const getPersonal = () => {
-  console.log(personalData)
   const params = {
     id: personalData[0]._id || ''
   }
