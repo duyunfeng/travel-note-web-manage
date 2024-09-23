@@ -57,6 +57,7 @@ import { ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
 import router from '../../router/index';
 import { login, user } from '../../services/index.ts';
+import { cookie } from '../../utils/index.ts';
 
 const app = {
   info: {
@@ -83,14 +84,19 @@ const toLogin = () => {
     (res: any) => {
       saving.value = false;
       if (res.code === 200) {
-        user.getUser({ userName: form.userName }).then(
-          (res: any) => {
+        cookie.set('token', JSON.stringify(res.token));
+        user
+          .getUser({ userName: form.userName })
+          .then(
+            (res: any) => {
+              localStorage.setItem('isAuthenticated', 'true');
+              localStorage.setItem('user', JSON.stringify(res.data));
+            },
+            (err) => ElMessage.error(err.message)
+          )
+          .finally(() => {
             router.push('/');
-            localStorage.setItem('isAuthenticated', 'true');
-            localStorage.setItem('user', JSON.stringify(res.data));
-          },
-          (err) => ElMessage.error(err.message)
-        );
+          });
       }
       return ElMessage.success(res.message);
     },

@@ -6,7 +6,12 @@
     <el-menu-item index="1">黑暗模式 <el-switch class="ml5" v-model="model" /></el-menu-item>
     <el-sub-menu index="2">
       <template #title>{{ username }}</template>
-      <el-menu-item v-for="(item, key) in menus" :index="getIndex(key)" :key="key" @click="userClick(key)">
+      <el-menu-item
+        v-for="(item, key) in menus"
+        :index="getIndex(key)"
+        :key="key"
+        @click="userClick(key)"
+      >
         {{ item.name }}
       </el-menu-item>
     </el-sub-menu>
@@ -59,25 +64,27 @@
   </el-row>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
-import router from '../../router/index'
+import { ref } from 'vue';
+import router from '../../router/index';
+import { cookie } from '@/utils';
 
-const model = ref(false)
-const username = ref('管理员')
-const getIndex = (key:number) => `2-${key + 1}`
+const model = ref(false);
+const username = ref('管理员');
+const getIndex = (key: number) => `2-${key + 1}`;
 
 const menus = ref([
   { name: '个人中心', path: '/user' },
   { name: '密码修改', path: '/role' },
   { name: '系统设置', path: '/setting' },
   { name: '退出登录', path: '/logout' }
-])
+]);
 const userClick = (key: number) => {
   if (key === 3) {
-    localStorage.removeItem('isAuthenticated')
-    router.push('/login')
+    localStorage.setItem('isAuthenticated', 'false');
+    cookie.remove('token');
+    router.push('/login');
   }
-}
+};
 </script>
 <style scoped>
 .el-menu--horizontal > .el-menu-item:nth-child(1) {
