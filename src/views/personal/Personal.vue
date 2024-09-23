@@ -9,6 +9,9 @@
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             action="http://localhost:3000/api/upload"
+            :headers="{
+              Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
+            }"
             :before-upload="beforeAvatarUpload"
             name="image"
             class="ml15"
@@ -48,6 +51,7 @@ import { reactive, onMounted } from 'vue';
 import { personal } from '../../services/index';
 import { ElMessage } from 'element-plus';
 import type { UploadProps } from 'element-plus';
+import { cookie } from '../../utils/index';
 
 const form = reactive({
   name: '',
