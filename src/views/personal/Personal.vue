@@ -43,11 +43,15 @@
           <el-date-picker v-model="form.birthday" type="date" />
         </el-form-item>
       </el-form>
+      <div class="btn-group">
+        <el-button type="primary" @click="test">测试</el-button>
+        <el-button type="primary" @click="save">保存</el-button>
+      </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted, watch } from 'vue';
 import { personal } from '../../services/index';
 import { ElMessage } from 'element-plus';
 import type { UploadProps } from 'element-plus';
@@ -57,33 +61,37 @@ const form = reactive({
   name: '',
   userName: '',
   sex: 'secret',
-  birthday: '',
+  birthday: new Date(),
   desc: '',
   avatar: '',
   id: ''
 });
-let personalData = reactive([]);
 const getPersonal = () => {
-  const params = {
-    id: (personalData[0] as any)._id || ''
-  };
   personal
-    .getPersonal(params)
+    .getPersonal()
     .then((res) => {
+      console.log(res);
       for (const key in form) {
-        (form as any)[key] = res.data[key];
+        if (key === 'avatar') {
+          form.avatar = `http://localhost:3000${res.data.avatar}`;
+        } else if (key === 'birthday') {
+          form.birthday = new Date(Number(res.data.birthday));
+        } else {
+          (form as any)[key] = res.data[key];
+        }
       }
+      console.log(form);
     })
     .catch((err) => {
       ElMessage.error(err.message);
     });
 };
 onMounted(() => {
-  personalData = JSON.parse(localStorage.getItem('user') ?? '');
   getPersonal();
 });
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-  form.avatar = URL.createObjectURL(uploadFile.raw!);
+  console.log(response);
+  form.avatar = `http://localhost:3000${response.data.avatar}`;
 };
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   if (rawFile.type !== 'image/jpeg') {
@@ -96,7 +104,30 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
   return true;
 };
 
-const uploadAvatar = () => {};
+const test = () => {
+  const user = JSON.parse(localStorage.getItem('user') || '');
+  console.log(user);
+  form.avatar = `http://localhost:3000/avatar/${user.userName}/1.jpg`;
+};
+const save = () => {
+  const params = {
+    name: form.name,
+    sex: form.sex,
+    birthday: new Date(form.birthday).getTime(),
+    desc: form.desc,
+    avatar: form.avatar.replace('http://localhost:3000', '')
+  };
+  console.log(params);
+  personal
+    .updatePersonal(params)
+    .then((res) => {
+      console.log(res);
+      getPersonal();
+    })
+    .catch((err) => {
+      ElMessage.error(err.message);
+    });
+};
 </script>
 <style scoped>
 .personal {

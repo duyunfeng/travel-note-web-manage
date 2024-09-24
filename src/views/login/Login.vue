@@ -90,7 +90,7 @@ const toLogin = () => {
           .then(
             (res: any) => {
               localStorage.setItem('isAuthenticated', 'true');
-              localStorage.setItem('user', JSON.stringify(res.data));
+              localStorage.setItem('user', JSON.stringify(res.data[0]));
             },
             (err) => ElMessage.error(err.message)
           )

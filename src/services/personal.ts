@@ -1,4 +1,4 @@
-import { get } from './config'
+import { get, put } from './config';
 
-export const getPersonal = (params: any) => get('/personal/getPersonal', params);
-
+export const getPersonal = () => get('/personal/getPersonal');
+export const updatePersonal = (params: any) => put('/personal/updatePersonal', params);
