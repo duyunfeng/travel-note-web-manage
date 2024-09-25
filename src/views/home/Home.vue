@@ -1,5 +1,5 @@
 <template>
-  <el-menu class="el-menu" mode="horizontal" :ellipsis="false">
+  <el-menu class="el-menu-title" mode="horizontal" :ellipsis="false">
     <el-menu-item index="0">
       <img class="logo" src="../../assets/logo.png" alt="Logo" />
     </el-menu-item>
@@ -16,12 +16,12 @@
       </el-menu-item>
     </el-sub-menu>
   </el-menu>
-  <el-row class="mt20">
+  <el-row class="nav">
     <el-col :span="4" class="left">
       <el-menu class="el-menu-vertical" router>
         <el-sub-menu index="1">
           <template #title>
-            <el-icon :size="18"><location /></el-icon>
+            <el-icon :size="20"><location /></el-icon>
             <span>Navigator One</span>
           </template>
           <el-menu-item-group title="Group One">
@@ -58,7 +58,7 @@
         </el-menu-item>
       </el-menu>
     </el-col>
-    <el-col :span="18" class="right">
+    <el-col :span="20" class="right">
       <router-view />
     </el-col>
   </el-row>
@@ -90,6 +90,14 @@ const userClick = (key: number) => {
 .el-menu--horizontal > .el-menu-item:nth-child(1) {
   margin-right: auto;
 }
+.el-menu-title {
+  /* position: fixed; */
+  left: 0;
+  top: 0;
+  height: auto;
+  width: 100%;
+  z-index: 999;
+}
 .logo {
   width: 40px;
   height: 40px;
@@ -98,14 +106,21 @@ const userClick = (key: number) => {
   border: 3px solid #2c3142;
 }
 .left {
-  min-width: 200px;
+  width: 200px;
+  /* position: fixed; */
+}
+.el-menu-vertical {
+  height: 100vh;
 }
 .right {
-  min-width: 400px;
+  padding: 20px;
+  width: 90%;
+  height: 90%;
+  overflow-y: scroll;
+  scrollbar-width: none;
 }
-
-.el-menu-vertical {
-  min-width: 200px;
-  min-height: 70vh;
+.nav {
+  height: calc(100vh - 60px);
+  margin-bottom: 20px;
 }
 </style>

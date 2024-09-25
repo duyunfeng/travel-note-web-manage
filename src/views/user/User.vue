@@ -1,5 +1,5 @@
 <template>
-  <div class="user">
+  <div>
     <div><h2>用户管理</h2></div>
     <div class="content">
       <el-form :inline="true" :model="form" class="demo-form-inline">
@@ -44,9 +44,7 @@
               </el-button>
               <el-popconfirm title="确定重置密码吗？" @confirm="resetPasswrod(user.row)">
                 <template #reference>
-                  <el-button link type="primary" size="small">
-                    重置密码
-                  </el-button>
+                  <el-button link type="primary" size="small"> 重置密码 </el-button>
                 </template>
               </el-popconfirm>
               <el-button link type="primary" size="small" @click="deleteUser(user.row)"
@@ -160,7 +158,7 @@ const auditUser = (payload) => {
   }
 };
 const resetPasswrod = (row) => {
-  user.resetPassword({_id:row._id}).then(
+  user.resetPassword({ _id: row._id }).then(
     (res) => {
       if (res.code === 200) {
         ElMessage.success('重置成功');
@@ -171,11 +169,6 @@ const resetPasswrod = (row) => {
 };
 </script>
 <style scoped>
-.user {
-  padding: 20px;
-  width: 100%;
-  height: 100%;
-}
 .content {
   padding: 20px 20px 0;
 }

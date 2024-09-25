@@ -1,5 +1,5 @@
 <template>
-  <div class="personal">
+  <div>
     <div><h2>个人中心</h2></div>
     <div class="form">
       <el-form :model="form" label-width="auto" style="max-width: 600px">
@@ -130,11 +130,6 @@ const save = () => {
 };
 </script>
 <style scoped>
-.personal {
-  padding: 20px;
-  width: 100%;
-  height: 100%;
-}
 .form {
   padding: 20px 20px 0;
 }
