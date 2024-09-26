@@ -25,7 +25,8 @@ import {
   ElDrawer,
   ElRadio,
   ElPopconfirm,
-  ElUpload
+  ElUpload,
+  ElPageHeader
 } from 'element-plus'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
@@ -55,7 +56,8 @@ const components = {
   ElUpload,
   ElRadio,
   ElConfigProvider,
-  ElFormItem
+  ElFormItem,
+  ElPageHeader
 }
 
 export const registerElements = (app: any) => {

@@ -3,30 +3,40 @@
     <div><h2>用户管理</h2></div>
     <div class="content">
       <el-form :inline="true" :model="form" class="demo-form-inline">
-        <el-form-item label="用户名:">
-          <el-input v-model="form.userName" placeholder="请输入用户名" clearable />
-        </el-form-item>
-        <el-form-item label="Id:">
-          <el-input v-model="form.id" placeholder="请输入id" clearable />
-        </el-form-item>
-        <el-form-item label="昵称:">
-          <el-input v-model="form.name" placeholder="请输入昵称" clearable />
-        </el-form-item>
-        <el-form-item label="审核状态">
-          <el-select v-model="form.status">
-            <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="openCreateUser">新增用户</el-button>
-          <el-button type="primary" @click="getUser">查询</el-button>
-          <el-button @click="reset">重置</el-button>
-        </el-form-item>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item label="用户名:">
+              <el-input v-model="form.userName" placeholder="请输入用户名" clearable />
+            </el-form-item>
+            <el-form-item label="Id:">
+              <el-input v-model="form.id" placeholder="请输入id" clearable />
+            </el-form-item>
+            <el-form-item label="昵称:">
+              <el-input v-model="form.name" placeholder="请输入昵称" clearable />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="16">
+            <el-form-item label="审核状态">
+              <el-select v-model="form.status">
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item>
+              <el-button type="primary" @click="openCreateUser">新增用户</el-button>
+              <el-button type="primary" @click="getUser">查询</el-button>
+              <el-button @click="reset">重置</el-button>
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div class="mt20">
         <el-table :data="tableData" border style="width: 100%">
@@ -56,8 +66,8 @@
       </div>
     </div>
   </div>
-  <CreatUser title="创建用户" :isOpen="isOpen" @close="creatUser" />
-  <AuditUser title="审核用户" :isOpen="isShow" @close="auditUser" :row="userRow" />
+  <CreatUser title="创建用户" :isOpen="isOpen" @update:isOpen="creatUser" />
+  <AuditUser title="审核用户" :isOpen="isShow" @update:isOpen="auditUser" :row="userRow" />
 </template>
 <script lang="ts" setup>
 import CreatUser from './CreatUser.vue';
@@ -69,7 +79,7 @@ import { ElMessage } from 'element-plus';
 const form = reactive({ userName: '', name: '', status: '', id: '' });
 const isOpen = ref(false);
 const isShow = ref(false);
-const userRow = reactive({});
+let userRow = reactive({});
 const options = [
   { value: '', label: '全部' },
   { value: '0', label: '未审核' },
@@ -93,9 +103,9 @@ const reset = () => {
 const openCreateUser = () => {
   isOpen.value = true;
 };
-const openAuditUser = (row) => {
+const openAuditUser = (row: any) => {
   isShow.value = true;
-  userRow.value = row;
+  userRow = row;
 };
 const getUser = () => {
   const params = {
@@ -118,7 +128,7 @@ const getUser = () => {
   });
 };
 
-const deleteUser = (row) => {
+const deleteUser = (row: any) => {
   user.deleteUser(row._id).then((res) => {
     if (res.code === 200) {
       ElMessage.success('删除成功');
@@ -127,7 +137,7 @@ const deleteUser = (row) => {
   });
 };
 
-const creatUser = (payload) => {
+const creatUser = (payload: any) => {
   if (payload.isCreat) {
     user.creatUser(payload.form).then(
       () => {
@@ -142,7 +152,7 @@ const creatUser = (payload) => {
     isOpen.value = false;
   }
 };
-const auditUser = (payload) => {
+const auditUser = (payload: any) => {
   if (payload.isUpdate) {
     user.updateUser(payload.form).then(
       () => {
@@ -157,9 +167,9 @@ const auditUser = (payload) => {
     isShow.value = false;
   }
 };
-const resetPasswrod = (row) => {
+const resetPasswrod = (row: any) => {
   user.resetPassword({ _id: row._id }).then(
-    (res) => {
+    (res: any) => {
       if (res.code === 200) {
         ElMessage.success('重置成功');
       }

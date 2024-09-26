@@ -45,8 +45,12 @@
         <el-sub-menu index="3">
           <template #title>
             <el-icon :size="18"><document /></el-icon>
-            <span>Navigator Three</span>
+            <span>资源管理</span>
           </template>
+          <el-menu-item-group>
+            <el-menu-item index="foodInformation">美食资料</el-menu-item>
+            <el-menu-item index="siteInformation">景点资料</el-menu-item>
+          </el-menu-item-group>
         </el-sub-menu>
         <el-menu-item index="user">
           <el-icon :size="18"><user /></el-icon>

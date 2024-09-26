@@ -1,7 +1,7 @@
 <template>
-  <el-drawer v-model="props.isOpen" direction="rtl" :before-close="cannelClick">
+  <el-drawer v-model="modelIsOpen" direction="rtl" :before-close="cannelClick">
     <template #header>
-      <h4>{{ props.title }}</h4>
+      <h4>{{ title }}</h4>
     </template>
     <template #default>
       <div class="form">
@@ -46,17 +46,24 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, defineProps, computed } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 const props = defineProps({
-  isOpen: Boolean,
-  title: String
+  isOpen: {
+    type: Boolean,
+    default: false
+  },
+  title: {
+    type: String,
+    default: '创建用户'
+  }
 });
+const modelIsOpen = computed(() => props.isOpen);
 const options = [
   { value: 'operator', label: '操作员' },
   { value: 'user', label: '普通用户' }
 ];
-const payload = {
+const payload: any = {
   isCreat: false,
   form: null
 };
@@ -105,7 +112,7 @@ const rules = reactive<FormRules<typeof form>>({
   checkPass: [{ validator: validatePass2, trigger: 'blur' }]
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(['update:isOpen']);
 const reset = () => {
   form.name = '';
   form.userName = '';
@@ -116,13 +123,13 @@ const reset = () => {
 const cannelClick = () => {
   payload.isCreat = false;
   reset();
-  emit('close', payload);
+  emit('update:isOpen', payload);
 };
 
 const confirmClick = () => {
   payload.isCreat = true;
   payload.form = form;
-  emit('close', payload);
+  emit('update:isOpen', payload);
   if (!props.isOpen) {
     reset();
   }

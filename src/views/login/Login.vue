@@ -32,14 +32,6 @@
               autocomplete="off"
             />
           </el-form-item>
-          <!-- <el-form-item label="验证码">
-            <input
-              v-model="form.password"
-              placeholder="请输入验证码"
-              maxlength="4"
-              @keyup.enter="toLogin"
-            />
-          </el-form-item> -->
           <div class="op">
             <el-button type="primary" :loading="saving" @click="toLogin">登录</el-button>
           </div>
@@ -55,9 +47,9 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
-import router from '../../router/index';
-import { login, user } from '../../services/index.ts';
-import { cookie } from '../../utils/index.ts';
+import { useRouter } from 'vue-router';
+import { login, user } from '@/services/index';
+import { cookie } from '@/utils/index';
 
 const app = {
   info: {
@@ -70,6 +62,7 @@ const form = reactive({
   userName: '',
   password: ''
 });
+const router = useRouter();
 const toLogin = () => {
   if (!form.userName) {
     return ElMessage.error('请输入用户名');
@@ -77,7 +70,6 @@ const toLogin = () => {
   if (!form.password) {
     return ElMessage.error('请输入密码');
   }
-
   // TODO: 登录
   saving.value = true;
   login.login(form).then(
