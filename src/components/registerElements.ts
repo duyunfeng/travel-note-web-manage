@@ -1,4 +1,4 @@
-import 'element-plus/dist/index.css'
+import 'element-plus/dist/index.css';
 import {
   ElButton,
   ElMenu,
@@ -26,9 +26,10 @@ import {
   ElRadio,
   ElPopconfirm,
   ElUpload,
-  ElPageHeader
-} from 'element-plus'
-import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+  ElPageHeader,
+  ElCard
+} from 'element-plus';
+import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
 const components = {
   ElButton,
@@ -57,17 +58,18 @@ const components = {
   ElRadio,
   ElConfigProvider,
   ElFormItem,
-  ElPageHeader
-}
+  ElPageHeader,
+  ElCard
+};
 
 export const registerElements = (app: any) => {
   for (const component in components) {
-    app.component(component, components[component])
+    app.component(component, components[component]);
   }
-}
+};
 
 export const registerElementIcons = (app: any) => {
   for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-    app.component(key, component)
+    app.component(key, component);
   }
-}
+};

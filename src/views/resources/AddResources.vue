@@ -2,58 +2,151 @@
   <div class="page">
     <el-page-header @back="goBack" title="返回" class="pageheader">
       <template #content>
-        <span class="title"> {{ title }} </span>
+        <div class="title">
+          <strong>{{ op + type }}</strong>
+        </div>
       </template>
     </el-page-header>
-    <div class="content">
-      <div class="form"></div>
-    </div>
+    <el-card class="content">
+      <div class="form">
+        <div>
+          <el-form :model="form" label-width="80px">
+            <el-form-item :label="label">
+              <el-input style="width: 300px" v-model="form.name" />
+            </el-form-item>
+            <el-form-item label="封面">
+              <el-upload
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :action="uploadUrl"
+                :headers="{
+                  Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
+                }"
+                :before-upload="beforeAvatarUpload"
+                name="image"
+                class="avatar-uploader"
+              >
+                <img v-if="form.img" :src="form.img" class="avatar" />
+                <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+              </el-upload>
+            </el-form-item>
+            <el-form-item label="所在地">
+              <el-select v-model="form.city" filterable style="width: 300px" clearable>
+                <el-option
+                  v-for="item in options"
+                  :key="item.value"
+                  :label="item.label"
+                  :value="item.value"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item v-show="route.query.type === 'food'" label="味道简介">
+              <el-input
+                v-model="form.desc"
+                type="text"
+                :rows="4"
+                style="width: 300px"
+                placeholder="请输入内容"
+              />
+            </el-form-item>
+            <el-form-item :label="`${type}简介`">
+              <el-input
+                v-model="form.content"
+                style="width: 400px"
+                type="textarea"
+                :rows="4"
+                placeholder="请输入内容"
+              />
+            </el-form-item>
+            <el-form-item label="文章介绍">
+              {{ form.article }}
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="onSubmit">立即创建</el-button>
+              <el-button @click="goBack">取消</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+    </el-card>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import type { UploadProps } from 'element-plus';
+import { resources } from '@/services/index';
+import { cookie, getProvincesOptions, beforeUpload } from '@/utils';
 
 const router = useRouter();
 const route = useRoute();
-const title = computed(() => {
-  const op = route.params.id === 'create' ? '创建' : '编辑';
-  const type = route.query.type === 'food' ? '美食' : '景点';
-  return op + type;
+const uploadUrl = 'http://localhost:3000/api/upload/resource';
+const form = reactive({
+  name: '',
+  img: '',
+  city: '',
+  desc: '',
+  content: '',
+  article: ''
 });
+const options = getProvincesOptions();
+const label = ref('美食名称');
+const op = ref('创建');
+const type = ref('美食');
+onMounted(() => {
+  label.value = route.query.type === 'food' ? '美食名称' : '景点名称';
+  op.value = route.params.id === 'create' ? '创建' : '编辑';
+  type.value = route.query.type === 'food' ? '美食' : '景点';
+});
+
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+  form.img = `http://localhost:3000${response.data}`;
+};
+const beforeAvatarUpload = beforeUpload;
+const onSubmit = () => {
+  const params: any = { ...form };
+  params.type = route.query.type;
+  params.img = form.img.replace('http://localhost:3000', '');
+  console.log(form);
+  resources.createSource(params).then((res) => {
+    console.log(res);
+    goBack();
+  });
+};
 const goBack = () => {
-  console.log(title);
   router.back();
 };
 </script>
 <style scoped>
 .page {
-  overflow: hidden;
   width: 100%;
-  height: 100%;
-  background-color: #c2c2c2;
-
   .pageheader {
     background-color: #ffffff;
+    padding: 0 20px;
     height: 44px;
     line-height: 44px;
+    display: flex;
+    align-items: center;
   }
   .title {
     font-size: 14px;
   }
-
   .content {
-    width: 100%;
-    height: 100vh;
-    padding: 0 20px;
-    .form {
-      height: 100%;
-      width: 100%;
-      background-color: #ffffff;
-      margin: 0 auto;
-      border: 2px solid #c2c2c2;
-      border-radius: 16px;
-    }
+    height: 90vh;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    background-color: #f5f5f5;
   }
+  .form {
+    border: #f5f5f5 1px solid;
+    border-radius: 16px;
+    background-color: #ffffff;
+    padding: 12px 20px 0 20px;
+  }
+}
+.avatar-uploader .avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 </style>

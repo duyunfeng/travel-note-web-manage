@@ -1,9 +1,13 @@
 <template>
   <div>
-    <div><h2>景点历史</h2></div>
+    <Resources :title />
   </div>
 </template>
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import Resources from './Resources.vue';
+
+const title = '景点历史';
+</script>
 <style scoped>
 .content {
   padding: 20px 20px 0;

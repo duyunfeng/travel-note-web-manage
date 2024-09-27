@@ -1,7 +1,7 @@
 <template>
   <el-menu class="el-menu-title" mode="horizontal" :ellipsis="false">
     <el-menu-item index="0">
-      <img class="logo" src="../../assets/logo.png" alt="Logo" />
+      <div><img class="logo" src="../../assets/logo.png" alt="Logo" /></div>
     </el-menu-item>
     <el-menu-item index="1">黑暗模式 <el-switch class="ml5" v-model="model" /></el-menu-item>
     <el-sub-menu index="2">
@@ -18,7 +18,7 @@
   </el-menu>
   <el-row class="nav">
     <el-col :span="4" class="left">
-      <el-menu class="el-menu-vertical" router>
+      <el-menu class="el-menu-vertical" router @select="handleSelect" :default-active="activeKey">
         <el-sub-menu index="1">
           <template #title>
             <el-icon :size="20"><location /></el-icon>
@@ -63,15 +63,27 @@
       </el-menu>
     </el-col>
     <el-col :span="20" class="right">
-      <router-view />
+      <el-card class="border">
+        <template #header
+          ><h2>{{ pageHeaderTitle }}</h2></template
+        >
+        <router-view />
+      </el-card>
     </el-col>
   </el-row>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
-import router from '../../router/index';
+import { ref, onMounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { cookie } from '@/utils';
 
+const router = useRouter();
+const route = useRoute();
+let activeKey = ref('/');
+onMounted(() => {
+  activeKey.value = route.name as string;
+  handleSelect(activeKey.value);
+});
 const model = ref(false);
 const username = ref('管理员');
 const getIndex = (key: number) => `2-${key + 1}`;
@@ -82,6 +94,7 @@ const menus = ref([
   { name: '系统设置', path: '/setting' },
   { name: '退出登录', path: '/logout' }
 ]);
+const pageHeaderTitle = ref('首页');
 const userClick = (key: number) => {
   if (key === 3) {
     localStorage.setItem('isAuthenticated', 'false');
@@ -89,39 +102,54 @@ const userClick = (key: number) => {
     router.push('/login');
   }
 };
+const handleSelect = (key: string) => {
+  const options: any = {
+    foodInformation: '美食资料',
+    siteInformation: '景点历史',
+    user: '用户管理',
+    personal: '个人中心'
+  };
+  pageHeaderTitle.value = options[key] || '首页';
+};
 </script>
 <style scoped>
 .el-menu--horizontal > .el-menu-item:nth-child(1) {
   margin-right: auto;
 }
 .el-menu-title {
-  /* position: fixed; */
   left: 0;
   top: 0;
   height: auto;
+  position: fixed;
   width: 100%;
   z-index: 999;
 }
 .logo {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   background-color: #2c3142;
   border-radius: 50px;
   border: 3px solid #2c3142;
 }
 .left {
   width: 200px;
-  /* position: fixed; */
+  top: 60px;
+  position: relative;
 }
 .el-menu-vertical {
   height: 100vh;
 }
 .right {
+  position: relative;
+  top: 60px;
   padding: 20px;
-  width: 90%;
-  height: 90%;
+  height: 100%;
+
   overflow-y: scroll;
   scrollbar-width: none;
+}
+.border {
+  border-radius: 16px;
 }
 .nav {
   height: calc(100vh - 60px);

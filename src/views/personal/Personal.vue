@@ -1,6 +1,5 @@
 <template>
   <div>
-    <div><h2>个人中心</h2></div>
     <div class="form">
       <el-form :model="form" label-width="auto" style="max-width: 600px">
         <el-form-item label="头像:" class="avatar">
@@ -55,7 +54,7 @@ import { reactive, onMounted, watch } from 'vue';
 import { personal } from '../../services/index';
 import { ElMessage } from 'element-plus';
 import type { UploadProps } from 'element-plus';
-import { cookie } from '../../utils/index';
+import { cookie, beforeUpload } from '../../utils/index';
 
 const form = reactive({
   name: '',
@@ -70,7 +69,6 @@ const getPersonal = () => {
   personal
     .getPersonal()
     .then((res) => {
-      console.log(res);
       for (const key in form) {
         if (key === 'avatar') {
           form.avatar = `http://localhost:3000${res.data.avatar}`;
@@ -80,7 +78,6 @@ const getPersonal = () => {
           (form as any)[key] = res.data[key];
         }
       }
-      console.log(form);
     })
     .catch((err) => {
       ElMessage.error(err.message);
@@ -90,23 +87,12 @@ onMounted(() => {
   getPersonal();
 });
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-  console.log(response);
   form.avatar = `http://localhost:3000${response.data.avatar}`;
 };
-const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  if (rawFile.type !== 'image/jpeg') {
-    ElMessage.error('Avatar picture must be JPG format!');
-    return false;
-  } else if (rawFile.size / 1024 / 1024 > 2) {
-    ElMessage.error('Avatar picture size can not exceed 2MB!');
-    return false;
-  }
-  return true;
-};
+const beforeAvatarUpload = beforeUpload;
 
 const test = () => {
   const user = JSON.parse(localStorage.getItem('user') || '');
-  console.log(user);
   form.avatar = `http://localhost:3000/avatar/${user.userName}/1.jpg`;
 };
 const save = () => {
@@ -117,11 +103,9 @@ const save = () => {
     desc: form.desc,
     avatar: form.avatar.replace('http://localhost:3000', '')
   };
-  console.log(params);
   personal
     .updatePersonal(params)
     .then((res) => {
-      console.log(res);
       getPersonal();
     })
     .catch((err) => {
@@ -131,7 +115,7 @@ const save = () => {
 </script>
 <style scoped>
 .form {
-  padding: 20px 20px 0;
+  padding: 0 20px;
 }
 .avatar {
   display: flex;

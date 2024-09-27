@@ -1,9 +1,6 @@
 <template>
   <div>
     <div>
-      <h2>{{ title }}</h2>
-    </div>
-    <div>
       <el-form :inline="true" :model="form" class="demo-form-inline">
         <el-row>
           <el-col :span="24">
@@ -36,10 +33,15 @@
       <div class="table">
         <el-table :data="tableData" border style="width: 100%">
           <el-table-column fixed prop="name" label="名称" width="150" />
-          <el-table-column prop="pic" label="图片" width="120" />
-          <el-table-column prop="provinces" label="所属省份" width="120" />
-          <el-table-column prop="city" label="所属城市" width="120" />
-          <el-table-column prop="address" label="地址" width="300" />
+          <el-table-column prop="img" label="封面" width="120">
+            <template #default="scope">
+              {{ `localhost:3000${scope.row.img}` }}
+              <img :src="`localhost:3000${scope.row.img}`" />
+            </template>
+          </el-table-column>
+          <el-table-column prop="city" label="地址" width="300" />
+          <el-table-column prop="description" label="味道简介" width="120" />
+          <el-table-column prop="content" label="美食简介" width="120" />
           <el-table-column prop="creatTime" label="创建时间" width="120" />
           <el-table-column prop="updateTime" label="更新时间" width="120" />
           <el-table-column prop="creater" label="创建者" width="120" />
@@ -61,36 +63,39 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, defineProps } from 'vue';
-import { useRouter } from 'vue-router';
-import { provinces } from './provinces';
-const props = defineProps({
-  title: String,
-  tableData: []
-});
+import { ref, reactive, defineProps } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { resources } from '@/services/index';
+import { getProvincesOptions } from '@/utils';
+
+const tableData = ref([]);
 const router = useRouter();
+const route = useRoute();
 const form = reactive({
   name: '',
   provinces: '',
   citys: ''
 });
-const provincesOptions = provinces.map((item) => {
-  return {
-    value: item.code,
-    label: item.name
-  };
-});
-
+const provincesOptions = getProvincesOptions();
+const type = route.name === 'foodInformation' ? 'food' : 'travel';
 const addResource = () => {
+  console.log(route.name, type);
   router.push({
     name: 'addResource',
     params: { id: 'create' },
-    query: { type: 'food' }
+    query: { type }
   });
-  console.log('新增资源');
 };
 
 const getResource = () => {
+  resources.getSource({ type }).then((res) => {
+    console.log(res);
+    tableData.value = res.data.map((item: any) => {
+      item.creatTime = new Date(item.creatTime);
+      item.updateTime = new Date(item.updateTime);
+      return item;
+    });
+  });
   console.log('查询');
 };
 
@@ -117,6 +122,7 @@ const deleteResource = () => {
 <style scoped>
 .content {
   padding: 20px 20px 0;
+  height: 100%;
 }
 .demo-form-inline .el-input {
   --el-input-width: 220px;

@@ -1,6 +1,5 @@
 <template>
   <div>
-    <div><h2>用户管理</h2></div>
     <div class="content">
       <el-form :inline="true" :model="form" class="demo-form-inline">
         <el-row>
@@ -115,7 +114,7 @@ const getUser = () => {
     id: form.id
   };
   user.getUser(params).then((res) => {
-    tableData.value = res.data.map((item) => {
+    tableData.value = res.data.map((item: any) => {
       const statusArr = ['未审核', '已审核', '已拒绝'];
       return {
         ...item,
@@ -180,7 +179,7 @@ const resetPasswrod = (row: any) => {
 </script>
 <style scoped>
 .content {
-  padding: 20px 20px 0;
+  padding: 0 20px;
 }
 .demo-form-inline .el-input {
   --el-input-width: 220px;
