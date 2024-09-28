@@ -27,7 +27,10 @@ import {
   ElPopconfirm,
   ElUpload,
   ElPageHeader,
-  ElCard
+  ElCard,
+  ElImage,
+  ElPagination,
+  ElLink
 } from 'element-plus';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
@@ -59,7 +62,10 @@ const components = {
   ElConfigProvider,
   ElFormItem,
   ElPageHeader,
-  ElCard
+  ElCard,
+  ElImage,
+  ElPagination,
+  ElLink
 };
 
 export const registerElements = (app: any) => {

@@ -132,7 +132,7 @@ const handleSelect = (key: string) => {
   border: 3px solid #2c3142;
 }
 .left {
-  width: 200px;
+  min-width: 200px;
   top: 60px;
   position: relative;
 }
@@ -144,6 +144,7 @@ const handleSelect = (key: string) => {
   top: 60px;
   padding: 20px;
   height: 100%;
+  max-width: calc(100% - 200px);
 
   overflow-y: scroll;
   scrollbar-width: none;

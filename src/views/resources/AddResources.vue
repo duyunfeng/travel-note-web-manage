@@ -19,14 +19,11 @@
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
                 :action="uploadUrl"
-                :headers="{
-                  Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
-                }"
                 :before-upload="beforeAvatarUpload"
                 name="image"
                 class="avatar-uploader"
               >
-                <img v-if="form.img" :src="form.img" class="avatar" />
+                <el-image v-if="form.img" :src="form.img" class="avatar" fit="contain" />
                 <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
               </el-upload>
             </el-form-item>
@@ -62,7 +59,7 @@
               {{ form.article }}
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" @click="onSubmit">立即创建</el-button>
+              <el-button type="primary" @click="onSubmit">提交</el-button>
               <el-button @click="goBack">取消</el-button>
             </el-form-item>
           </el-form>
@@ -74,14 +71,14 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import type { UploadProps } from 'element-plus';
+import { ElMessage, type UploadProps } from 'element-plus';
 import { resources } from '@/services/index';
 import { cookie, getProvincesOptions, beforeUpload } from '@/utils';
 
 const router = useRouter();
 const route = useRoute();
 const uploadUrl = 'http://localhost:3000/api/upload/resource';
-const form = reactive({
+const form: any = reactive({
   name: '',
   img: '',
   city: '',
@@ -97,6 +94,12 @@ onMounted(() => {
   label.value = route.query.type === 'food' ? '美食名称' : '景点名称';
   op.value = route.params.id === 'create' ? '创建' : '编辑';
   type.value = route.query.type === 'food' ? '美食' : '景点';
+  console.log(route.query);
+  if (route.params.id === 'edit') {
+    for (const key in form) {
+      form[key] = route.query[key];
+    }
+  }
 });
 
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
@@ -108,10 +111,27 @@ const onSubmit = () => {
   params.type = route.query.type;
   params.img = form.img.replace('http://localhost:3000', '');
   console.log(form);
-  resources.createSource(params).then((res) => {
-    console.log(res);
-    goBack();
-  });
+  if (route.params.id === 'edit') {
+    resources.updateSource(params).then(
+      (res) => {
+        ElMessage.success('更新成功');
+        goBack();
+      },
+      (err) => {
+        ElMessage.error(err.message);
+      }
+    );
+  } else if (route.params.id === 'create') {
+    resources.createSource(params).then(
+      (res) => {
+        ElMessage.success('创建成功');
+        goBack();
+      },
+      (err) => {
+        ElMessage.error(err.message);
+      }
+    );
+  }
 };
 const goBack = () => {
   router.back();
@@ -145,8 +165,8 @@ const goBack = () => {
   }
 }
 .avatar-uploader .avatar {
-  width: 178px;
-  height: 178px;
+  width: 200px;
+  height: 200px;
   display: block;
 }
 </style>

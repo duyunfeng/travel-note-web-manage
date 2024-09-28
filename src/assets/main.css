@@ -32,6 +32,10 @@
   margin-right: 5px;
 }
 
+.mr12 {
+  margin-right: 12px;
+}
+
 .ml5 {
   margin-left: 5px;
 }
@@ -39,8 +43,20 @@
   margin-left: 15px;
 }
 
+.mt5 {
+  margin-top: 5px;
+}
+
+.mt10 {
+  margin-top: 10px;
+}
+
 .mt20 {
   margin-top: 20px;
+}
+
+.mb20 {
+  margin-bottom: 20px;
 }
 
 .wd200 {
