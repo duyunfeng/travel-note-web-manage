@@ -18,6 +18,9 @@
               <el-upload
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
+                :headers="{
+                  Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
+                }"
                 :action="uploadUrl"
                 :before-upload="beforeAvatarUpload"
                 name="image"
