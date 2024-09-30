@@ -64,20 +64,17 @@
               </el-popconfirm>
               <el-popconfirm title="确定删除用户吗？" @confirm="deleteUser(user.row)">
                 <template #reference>
-                  <el-tooltip
-                    effect="dark"
-                    v-if="user.row.userName === 'admin'"
-                    content="无权限"
-                    placement="top-start"
-                  >
-                    <el-button
-                      :disabled="user.row.userName === 'admin'"
-                      link
-                      type="primary"
-                      size="small"
-                      >删除</el-button
-                    >
-                  </el-tooltip>
+                  <span v-if="user.row.userName === 'admin'">
+                    <el-tooltip effect="dark" content="无权限" placement="top-start">
+                      <el-button
+                        :disabled="user.row.userName === 'admin'"
+                        link
+                        type="primary"
+                        size="small"
+                        >删除</el-button
+                      >
+                    </el-tooltip>
+                  </span>
                   <el-button
                     v-else
                     :disabled="user.row.userName === 'admin'"
