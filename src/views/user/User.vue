@@ -42,13 +42,19 @@
           <el-table-column fixed prop="userName" label="用户名" width="150" />
           <el-table-column prop="name" label="昵称" width="120" />
           <el-table-column prop="id" label="Id" width="120" />
-          <el-table-column prop="status" label="审核状态" width="120" />
+          <el-table-column prop="statusLabel" label="审核状态" width="120" />
           <el-table-column prop="role" label="角色" width="120" />
           <el-table-column prop="createTime" label="创建时间" width="120" />
           <el-table-column prop="updateTime" label="更新时间" width="120" />
           <el-table-column fixed="right" label="操作" min-width="200">
             <template #default="user">
-              <el-button link type="primary" size="small" @click="openAuditUser(user.row)">
+              <el-button
+                v-if="user.row.status !== 1"
+                link
+                type="primary"
+                size="small"
+                @click="openAuditUser(user.row)"
+              >
                 审核
               </el-button>
               <el-popconfirm title="确定重置密码吗？" @confirm="resetPasswrod(user.row)">
@@ -56,9 +62,32 @@
                   <el-button link type="primary" size="small"> 重置密码 </el-button>
                 </template>
               </el-popconfirm>
-              <el-button link type="primary" size="small" @click="deleteUser(user.row)"
-                >删除</el-button
-              >
+              <el-popconfirm title="确定删除用户吗？" @confirm="deleteUser(user.row)">
+                <template #reference>
+                  <el-tooltip
+                    effect="dark"
+                    v-if="user.row.userName === 'admin'"
+                    content="无权限"
+                    placement="top-start"
+                  >
+                    <el-button
+                      :disabled="user.row.userName === 'admin'"
+                      link
+                      type="primary"
+                      size="small"
+                      >删除</el-button
+                    >
+                  </el-tooltip>
+                  <el-button
+                    v-else
+                    :disabled="user.row.userName === 'admin'"
+                    link
+                    type="primary"
+                    size="small"
+                    >删除</el-button
+                  >
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -78,6 +107,7 @@ import { ElMessage } from 'element-plus';
 const form = reactive({ userName: '', name: '', status: '', id: '' });
 const isOpen = ref(false);
 const isShow = ref(false);
+const tipShow = ref(false);
 let userRow = reactive({});
 const options = [
   { value: '', label: '全部' },
@@ -103,6 +133,7 @@ const openCreateUser = () => {
   isOpen.value = true;
 };
 const openAuditUser = (row: any) => {
+  console.log(row);
   isShow.value = true;
   userRow = row;
 };
@@ -119,7 +150,7 @@ const getUser = () => {
       return {
         ...item,
         role: item.role === 'user' ? '普通用户' : '管理员',
-        status: statusArr[item.status],
+        statusLabel: statusArr[item.status],
         createTime: new Date(item.createTime),
         updateTime: new Date(item.updateTime)
       };

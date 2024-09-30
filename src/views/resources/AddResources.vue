@@ -14,6 +14,9 @@
             <el-form-item :label="label">
               <el-input style="width: 300px" v-model="form.name" />
             </el-form-item>
+            <el-form-item v-if="route.params.id === 'edit'" label="Id">
+              {{ form.id }}
+            </el-form-item>
             <el-form-item label="封面">
               <el-upload
                 :show-file-list="false"
@@ -87,7 +90,8 @@ const form: any = reactive({
   city: '',
   desc: '',
   content: '',
-  article: ''
+  article: '',
+  id: ''
 });
 const options = getProvincesOptions();
 const label = ref('美食名称');

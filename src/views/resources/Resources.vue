@@ -37,7 +37,7 @@
               >
                 <el-button type="primary">下载模板</el-button>
               </el-link>
-              <el-button type="primary" @click="importResources('mul')">批量导入</el-button>
+              <el-button type="primary" @click="importResources">批量导入</el-button>
               <el-button type="primary" @click="addResource">新增</el-button>
               <el-button type="primary" @click="getResource">查询</el-button>
             </el-form-item>
@@ -47,7 +47,7 @@
       <div class="table">
         <el-table :data="tableData" border style="width: 100%" max-height="600">
           <el-table-column fixed prop="name" label="名称" width="120" />
-          <el-table-column fixed prop="id" label="Id" width="80" />
+          <el-table-column prop="id" label="Id" width="80" />
           <el-table-column prop="img" label="封面" width="140">
             <template #default="scope">
               <div class="img-container">
@@ -66,7 +66,7 @@
             </template>
           </el-table-column>
           <el-table-column prop="cityLabel" label="地址" width="120" />
-          <el-table-column prop="desc" label="味道简介" width="120" />
+          <el-table-column prop="desc" v-if="type === 'food'" label="味道简介" width="120" />
           <el-table-column prop="content" show-overflow-tooltip label="美食简介" width="120" />
           <el-table-column prop="createTime" label="创建时间" width="120" />
           <el-table-column prop="updateTime" label="更新时间" width="120" />
@@ -76,10 +76,14 @@
               <el-button link type="primary" size="small" @click="editResource(table.row)"
                 >编辑</el-button
               >
-              <el-button link type="primary" size="small" @click="viewOperationHistory">
+              <el-button link type="primary" size="small" @click="viewOperationHistory(table.row)">
                 查看操作记录
               </el-button>
-              <el-button link type="primary" size="small" @click="deleteResource">删除</el-button>
+              <el-popconfirm title="确定删除资源吗？" @confirm="deleteResource(table.row)">
+                <template #reference>
+                  <el-button link type="primary" size="small">删除</el-button>
+                </template>
+              </el-popconfirm>
             </template>
           </el-table-column>
         </el-table>
@@ -93,25 +97,21 @@
       </div>
     </div>
   </div>
-  <el-dialog v-model="dialogVisible" title="批量导入" width="500">
-    <el-upload
-      class="upload-demo"
-      drag
-      action="http://localhost:3000/api/upload/mulResource"
-      :headers="{
-        Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
-      }"
-      multiple
-    >
-      <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-      <div class="el-upload__text">拖拽文件到此处或者 <em>点击选择文件上传</em></div>
-    </el-upload>
-  </el-dialog>
+  <Dialog
+    :upload="dialogVisible"
+    :opTabale="opTableVisible"
+    :name="'resource'"
+    :row="tableRow"
+    @update:opTabale="opTableVisible = $event"
+    @update:upload="dialogVisible = $event"
+  />
 </template>
 <script lang="ts" setup>
 import ElPaginationComponent from '@/components/ElPaginationComponent.vue';
+import Dialog from './Dialog.vue';
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { ElMessage } from 'element-plus';
 import { resources } from '@/services/index';
 import { getProvincesOptions } from '@/utils';
 import { cookie } from '@/utils/index';
@@ -130,10 +130,12 @@ const pageData = reactive({
   pageSize: 10,
   total: 0
 });
+const tableRow: any = reactive({});
 const dialogVisible = ref(false);
+const opTableVisible = ref(false);
 const srcList: Array<any> = reactive([]);
 const provincesOptions = getProvincesOptions();
-const type = route.name === 'foodInformation' ? 'food' : 'travel';
+const type = route.name === 'foodInformation' ? 'food' : 'site';
 const addResource = () => {
   router.push({
     name: 'addResource',
@@ -163,13 +165,9 @@ const getResource = () => {
   });
 };
 
-const importResources = (type?: string) => {
-  if (type === 'mul') {
-    dialogVisible.value = true;
-    console.log('批量导入');
-  } else {
-    console.log('导入');
-  }
+const importResources = () => {
+  dialogVisible.value = true;
+  console.log('批量导入');
 };
 const editResource = (row: any) => {
   console.log('编辑');
@@ -180,11 +178,20 @@ const editResource = (row: any) => {
     query: { ...row, type }
   });
 };
-const viewOperationHistory = () => {
+const viewOperationHistory = (row: any) => {
+  for (const key in row) {
+    tableRow[key] = row[key];
+  }
+  opTableVisible.value = true;
   console.log('查看操作记录');
 };
-const deleteResource = () => {
+const deleteResource = (row: any) => {
   console.log('删除');
+  resources.deleteSource(row.id).then((res) => {
+    console.log(res);
+    ElMessage.success('删除成功');
+    getResource();
+  });
 };
 onMounted(() => {
   getResource();

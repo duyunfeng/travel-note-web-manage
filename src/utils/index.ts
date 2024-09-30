@@ -14,7 +14,6 @@ const getProvincesOptions = () => {
 };
 
 const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  console.log(rawFile);
   if (rawFile.type !== 'image/jpeg') {
     ElMessage.error('Avatar picture must be JPG format!');
     return false;

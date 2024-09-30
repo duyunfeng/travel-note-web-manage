@@ -1,12 +1,10 @@
 <template>
   <div>
-    <Resources :title />
+    <Resources />
   </div>
 </template>
 <script lang="ts" setup>
 import Resources from './Resources.vue';
-
-const title = '景点历史';
 </script>
 <style scoped>
 .content {

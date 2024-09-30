@@ -130,7 +130,7 @@ const confirmClick = () => {
   payload.isCreat = true;
   payload.form = form;
   emit('update:isOpen', payload);
-  if (!props.isOpen) {
+  if (props.isOpen) {
     reset();
   }
 };

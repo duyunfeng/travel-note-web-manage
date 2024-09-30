@@ -5,12 +5,14 @@
         <el-form-item label="头像:" class="avatar">
           <el-avatar :size="50" :src="form.avatar" />
           <el-upload
+            ref="uploadRef"
             :show-file-list="false"
             :on-success="handleAvatarSuccess"
             action="http://localhost:3000/api/upload"
             :headers="{
               Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
             }"
+            :auto-upload="false"
             :before-upload="beforeAvatarUpload"
             name="image"
             class="ml15"
@@ -50,12 +52,13 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { reactive, onMounted, watch } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import { personal } from '../../services/index';
 import { ElMessage } from 'element-plus';
-import type { UploadProps } from 'element-plus';
+import type { UploadProps, UploadInstance } from 'element-plus';
 import { cookie, beforeUpload } from '../../utils/index';
 
+const uploadRef = ref<UploadInstance>();
 const form = reactive({
   name: '',
   userName: '',
@@ -87,6 +90,7 @@ onMounted(() => {
   getPersonal();
 });
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+  console.log(response);
   form.avatar = `http://localhost:3000${response.data.avatar}`;
 };
 const beforeAvatarUpload = beforeUpload;
@@ -95,7 +99,8 @@ const test = () => {
   const user = JSON.parse(localStorage.getItem('user') || '');
   form.avatar = `http://localhost:3000/avatar/${user.userName}/1.jpg`;
 };
-const save = () => {
+const save = async () => {
+  await uploadRef.value!.submit();
   const params = {
     name: form.name,
     sex: form.sex,

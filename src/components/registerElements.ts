@@ -30,7 +30,8 @@ import {
   ElCard,
   ElImage,
   ElPagination,
-  ElLink
+  ElLink,
+  ElTooltip
 } from 'element-plus';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
@@ -65,7 +66,8 @@ const components = {
   ElCard,
   ElImage,
   ElPagination,
-  ElLink
+  ElLink,
+  ElTooltip
 };
 
 export const registerElements = (app: any) => {
