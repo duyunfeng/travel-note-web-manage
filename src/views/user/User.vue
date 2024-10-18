@@ -38,56 +38,56 @@
         </el-row>
       </el-form>
       <div class="mt20">
-        <el-table :data="tableData" border style="width: 100%">
-          <el-table-column fixed prop="userName" label="用户名" width="150" />
-          <el-table-column prop="name" label="昵称" width="120" />
-          <el-table-column prop="id" label="Id" width="120" />
-          <el-table-column prop="statusLabel" label="审核状态" width="120" />
-          <el-table-column prop="role" label="角色" width="120" />
-          <el-table-column prop="createTime" label="创建时间" width="120" />
-          <el-table-column prop="updateTime" label="更新时间" width="120" />
-          <el-table-column fixed="right" label="操作" min-width="200">
-            <template #default="user">
-              <el-button
-                v-if="user.row.status !== 1"
-                link
-                type="primary"
-                size="small"
-                @click="openAuditUser(user.row)"
-              >
-                审核
-              </el-button>
-              <el-popconfirm title="确定重置密码吗？" @confirm="resetPasswrod(user.row)">
-                <template #reference>
-                  <el-button link type="primary" size="small"> 重置密码 </el-button>
-                </template>
-              </el-popconfirm>
-              <el-popconfirm title="确定删除用户吗？" @confirm="deleteUser(user.row)">
-                <template #reference>
-                  <span v-if="user.row.userName === 'admin'">
-                    <el-tooltip effect="dark" content="无权限" placement="top-start">
-                      <el-button
-                        :disabled="user.row.userName === 'admin'"
-                        link
-                        type="primary"
-                        size="small"
-                        >删除</el-button
-                      >
-                    </el-tooltip>
-                  </span>
-                  <el-button
-                    v-else
-                    :disabled="user.row.userName === 'admin'"
-                    link
-                    type="primary"
-                    size="small"
-                    >删除</el-button
-                  >
-                </template>
-              </el-popconfirm>
-            </template>
-          </el-table-column>
-        </el-table>
+        <Table
+          :data="tableData"
+          :columns="columns"
+          :currentPageNumber="pageData.currentPage"
+          :pageSizeNumber="pageData.pageSize"
+          :total="pageData.total"
+          :paginationDirection="'right'"
+          @update:pageSizeNumber="handlePageData($event, 'pageSize')"
+          @update:currentPageNumber="handlePageData($event, 'currentPage')"
+        >
+          <template #op="scope">
+            <el-button
+              v-if="scope.scope.status !== 1"
+              link
+              type="primary"
+              size="small"
+              @click="openAuditUser(scope.scope)"
+            >
+              审核
+            </el-button>
+            <el-popconfirm title="确定重置密码吗？" @confirm="resetPasswrod(scope.scope)">
+              <template #reference>
+                <el-button link type="primary" size="small"> 重置密码 </el-button>
+              </template>
+            </el-popconfirm>
+            <el-popconfirm title="确定删除用户吗？" @confirm="deleteUser(scope.scope)">
+              <template #reference>
+                <span class="ml12" v-if="scope.scope.userName === 'admin'">
+                  <el-tooltip effect="dark" content="无权限" placement="top-start">
+                    <el-button
+                      :disabled="scope.scope.userName === 'admin'"
+                      link
+                      type="primary"
+                      size="small"
+                      >删除</el-button
+                    >
+                  </el-tooltip>
+                </span>
+                <el-button
+                  v-else
+                  :disabled="scope.scope.userName === 'admin'"
+                  link
+                  type="primary"
+                  size="small"
+                  >删除</el-button
+                >
+              </template>
+            </el-popconfirm>
+          </template>
+        </Table>
       </div>
     </div>
   </div>
@@ -96,15 +96,15 @@
 </template>
 <script lang="ts" setup>
 import CreatUser from './CreatUser.vue';
-import AuditUser from './AuditUser.vue';
 import { ref, reactive, onMounted } from 'vue';
 import { user } from '../../services/index';
 import { ElMessage } from 'element-plus';
+import { formatDate } from '@/utils';
+import type { PageType } from '@/types';
 
 const form = reactive({ userName: '', name: '', status: '', id: '' });
 const isOpen = ref(false);
 const isShow = ref(false);
-const tipShow = ref(false);
 let userRow = reactive({});
 const options = [
   { value: '', label: '全部' },
@@ -113,10 +113,81 @@ const options = [
   { value: '2', label: '已拒绝' }
 ];
 const tableData = ref([]);
+const pageData: PageType = reactive({
+  currentPage: 1,
+  pageSize: 10,
+  total: 0
+});
+const columns = ref([
+  {
+    prop: 'userName',
+    label: '用户名',
+    width: '150',
+    fixed: true,
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'name',
+    label: '昵称',
+    width: '120',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'id',
+    label: 'Id',
+    width: '120',
+    show: true,
+    showOverflowTooltip: false
+  },
 
+  {
+    prop: 'statusLabel',
+    label: '审核状态',
+    width: '120',
+    show: true,
+    showOverflowTooltip: true
+  },
+  {
+    prop: 'role',
+    label: '角色',
+    width: '120',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'createTime',
+    label: '创建时间',
+    width: '180',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'updateTime',
+    label: '更新时间',
+    width: '180',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    fixed: 'right',
+    label: '操作',
+    minWidth: '160',
+    isSlot: true,
+    show: true,
+    prop: 'op',
+    name: 'op',
+    showOverflowTooltip: false
+  }
+]);
 onMounted(async () => {
   await getUser();
 });
+const handlePageData = (val: number, type: keyof PageType) => {
+  pageData[type] = val;
+  getUser();
+};
 
 const reset = () => {
   form.userName = '';
@@ -130,7 +201,6 @@ const openCreateUser = () => {
   isOpen.value = true;
 };
 const openAuditUser = (row: any) => {
-  console.log(row);
   isShow.value = true;
   userRow = row;
 };
@@ -141,27 +211,44 @@ const getUser = () => {
     status: form.status,
     id: form.id
   };
-  user.getUser(params).then((res) => {
-    tableData.value = res.data.map((item: any) => {
-      const statusArr = ['未审核', '已审核', '已拒绝'];
-      return {
-        ...item,
-        role: item.role === 'user' ? '普通用户' : '管理员',
-        statusLabel: statusArr[item.status],
-        createTime: new Date(item.createTime),
-        updateTime: new Date(item.updateTime)
-      };
-    });
-  });
+  user.getUser(params).then(
+    (res) => {
+      tableData.value = res.data.map((item: any) => {
+        const statusArr = ['未审核', '已审核', '已拒绝'];
+        const userRole: { [key: string]: string } = {
+          admin: '管理员',
+          operator: '审核员',
+          user: '普通用户'
+        };
+        return {
+          ...item,
+          role: userRole[item.role],
+          statusLabel: statusArr[item.status],
+          createTime: formatDate(new Date(item.createTime)),
+          updateTime: formatDate(new Date(item.updateTime))
+        };
+      });
+    },
+    (error) => {
+      if (error.code !== 401) {
+        ElMessage.error(error.message);
+      }
+    }
+  );
 };
 
 const deleteUser = (row: any) => {
-  user.deleteUser(row._id).then((res) => {
-    if (res.code === 200) {
-      ElMessage.success('删除成功');
-      getUser();
+  user.deleteUser(row.id).then(
+    (res: any) => {
+      if (res.code === 200) {
+        ElMessage.success('删除成功');
+        getUser();
+      }
+    },
+    (error) => {
+      ElMessage.error(error.message);
     }
-  });
+  );
 };
 
 const creatUser = (payload: any) => {
@@ -181,7 +268,7 @@ const creatUser = (payload: any) => {
 };
 const auditUser = (payload: any) => {
   if (payload.isUpdate) {
-    user.updateUser(payload.form).then(
+    user.updateUser(payload).then(
       () => {
         getUser();
         isShow.value = false;
@@ -195,7 +282,7 @@ const auditUser = (payload: any) => {
   }
 };
 const resetPasswrod = (row: any) => {
-  user.resetPassword({ _id: row._id }).then(
+  user.resetPassword({ id: row.id }).then(
     (res: any) => {
       if (res.code === 200) {
         ElMessage.success('重置成功');

@@ -10,7 +10,7 @@
             :on-success="handleAvatarSuccess"
             action="http://localhost:3000/api/upload"
             :headers="{
-              Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
+              Authorization: `Bearer ${token}`
             }"
             :auto-upload="false"
             :before-upload="beforeAvatarUpload"
@@ -45,21 +45,25 @@
         </el-form-item>
       </el-form>
       <div class="btn-group">
-        <el-button type="primary" @click="test">测试</el-button>
-        <el-button type="primary" @click="save">保存</el-button>
+        <el-button type="primary" @click="changePassword">修改密码</el-button>
+        <el-button type="danger" @click="save">保存</el-button>
       </div>
     </div>
   </div>
 </template>
 <script lang="ts" setup>
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, reactive, onMounted } from 'vue';
 import { personal } from '../../services/index';
 import { ElMessage } from 'element-plus';
 import type { UploadProps, UploadInstance } from 'element-plus';
-import { cookie, beforeUpload } from '../../utils/index';
+import { beforeUpload } from '../../utils/index';
+import { useUserStore } from '@/stores/user';
+import { useLoginStore } from '@/stores/login';
 
+const { personalInfo, setPersonal } = useUserStore();
+const { token } = useLoginStore();
 const uploadRef = ref<UploadInstance>();
-const form = reactive({
+const form = ref({
   name: '',
   userName: '',
   sex: 'secret',
@@ -68,54 +72,41 @@ const form = reactive({
   avatar: '',
   id: ''
 });
-const getPersonal = () => {
-  personal
-    .getPersonal()
-    .then((res) => {
-      for (const key in form) {
-        if (key === 'avatar') {
-          form.avatar = `http://localhost:3000${res.data.avatar}`;
-        } else if (key === 'birthday') {
-          form.birthday = new Date(Number(res.data.birthday));
-        } else {
-          (form as any)[key] = res.data[key];
-        }
-      }
-    })
-    .catch((err) => {
-      ElMessage.error(err.message);
-    });
-};
 onMounted(() => {
-  getPersonal();
+  form.value = personalInfo;
 });
+
+const getPersonal = () => {
+  personal.getPersonal({ id: personalInfo.id }).then((res) => {
+    setPersonal(res);
+  });
+};
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
-  console.log(response);
-  form.avatar = `http://localhost:3000${response.data.avatar}`;
+  form.value.avatar = `http://localhost:3000${response.data.avatar}`;
 };
 const beforeAvatarUpload = beforeUpload;
-
-const test = () => {
-  const user = JSON.parse(localStorage.getItem('user') || '');
-  form.avatar = `http://localhost:3000/avatar/${user.userName}/1.jpg`;
-};
 const save = async () => {
   await uploadRef.value!.submit();
   const params = {
-    name: form.name,
-    sex: form.sex,
-    birthday: new Date(form.birthday).getTime(),
-    desc: form.desc,
-    avatar: form.avatar.replace('http://localhost:3000', '')
+    name: form.value.name,
+    sex: form.value.sex,
+    birthday: new Date(form.value.birthday).getTime(),
+    desc: form.value.desc,
+    avatar: form.value.avatar.replace('http://localhost:3000', '')
   };
   personal
     .updatePersonal(params)
-    .then((res) => {
+    .then(() => {
+      ElMessage.success('保存成功');
       getPersonal();
     })
     .catch((err) => {
       ElMessage.error(err.message);
     });
+};
+
+const changePassword = () => {
+  ElMessage.warning('暂未开放');
 };
 </script>
 <style scoped>

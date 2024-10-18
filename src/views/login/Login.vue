@@ -2,12 +2,11 @@
   <div class="page-login">
     <div class="login-container">
       <div class="logo">
-        <img src="../../assets/logo.png" alt="Logo" />
+        <img src="@/assets/image/logo.png" alt="Logo" />
         <div class="name">
           <span v-for="text in app.info.name" :key="text">{{ text }}</span>
         </div>
       </div>
-
       <p class="desc">旅行日记后台管理</p>
 
       <div class="login-form">
@@ -20,6 +19,7 @@
               type="text"
               :readonly="readonly"
               autocomplete="off"
+              @keydown.enter="toLogin"
               @focus="readonly = false"
             />
           </el-form-item>
@@ -30,6 +30,7 @@
               maxlength="20"
               type="password"
               autocomplete="off"
+              @keydown.enter="toLogin"
             />
           </el-form-item>
           <div class="op">
@@ -48,8 +49,13 @@
 import { ref, reactive } from 'vue';
 import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
-import { login, user } from '@/services/index';
-import { cookie } from '@/utils/index';
+import { login, user, personal } from '@/services/index';
+import { useUserStore } from '@/stores/user';
+import { useLoginStore } from '@/stores/login';
+import { setDarkMode } from '@/utils';
+
+const userStore = useUserStore();
+const loginStore = useLoginStore();
 
 const app = {
   info: {
@@ -72,17 +78,18 @@ const toLogin = () => {
   }
   // TODO: 登录
   saving.value = true;
+
   login.login(form).then(
     (res: any) => {
       saving.value = false;
+      loginStore.setToken(res.token);
       if (res.code === 200) {
-        cookie.set('token', JSON.stringify(res.token));
-        user
-          .getUser({ userName: form.userName })
+        Promise.all([user.getUser({ id: res.data.id }), personal.getPersonal({ id: res.data.id })])
           .then(
-            (res: any) => {
-              localStorage.setItem('isAuthenticated', 'true');
-              localStorage.setItem('user', JSON.stringify(res.data[0]));
+            ([user, personal]: Array<any>) => {
+              loginStore.changeIsAuthent(true);
+              userStore.setUserInfo(user.data[0]);
+              userStore.setPersonal(personal.data);
             },
             (err) => ElMessage.error(err.message)
           )
@@ -90,11 +97,11 @@ const toLogin = () => {
             router.push('/');
           });
       }
-      return ElMessage.success(res.message);
+      ElMessage.success(res.message);
     },
     (err) => {
       saving.value = false;
-      return ElMessage.error(err.message);
+      ElMessage.error(err.message);
     }
   );
 };

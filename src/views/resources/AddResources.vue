@@ -22,7 +22,7 @@
                 :show-file-list="false"
                 :on-success="handleAvatarSuccess"
                 :headers="{
-                  Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
+                  Authorization: `Bearer ${token}`
                 }"
                 :action="uploadUrl"
                 :before-upload="beforeAvatarUpload"
@@ -79,8 +79,10 @@ import { ref, onMounted, reactive } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ElMessage, type UploadProps } from 'element-plus';
 import { resources } from '@/services/index';
-import { cookie, getProvincesOptions, beforeUpload } from '@/utils';
+import { getProvincesOptions, beforeUpload } from '@/utils';
+import { useLoginStore } from '@/stores/login';
 
+const { token } = useLoginStore();
 const router = useRouter();
 const route = useRoute();
 const uploadUrl = 'http://localhost:3000/api/upload/resource';
@@ -101,7 +103,6 @@ onMounted(() => {
   label.value = route.query.type === 'food' ? '美食名称' : '景点名称';
   op.value = route.params.id === 'create' ? '创建' : '编辑';
   type.value = route.query.type === 'food' ? '美食' : '景点';
-  console.log(route.query);
   if (route.params.id === 'edit') {
     for (const key in form) {
       form[key] = route.query[key];
@@ -117,7 +118,6 @@ const onSubmit = () => {
   const params: any = { ...form };
   params.type = route.query.type;
   params.img = form.img.replace('http://localhost:3000', '');
-  console.log(form);
   if (route.params.id === 'edit') {
     resources.updateSource(params).then(
       (res) => {
@@ -147,29 +147,26 @@ const goBack = () => {
 <style scoped>
 .page {
   width: 100%;
-  .pageheader {
-    background-color: #ffffff;
-    padding: 0 20px;
-    height: 44px;
-    line-height: 44px;
-    display: flex;
-    align-items: center;
-  }
-  .title {
-    font-size: 14px;
-  }
-  .content {
-    height: 90vh;
-    overflow-y: scroll;
-    scrollbar-width: none;
-    background-color: #f5f5f5;
-  }
-  .form {
-    border: #f5f5f5 1px solid;
-    border-radius: 16px;
-    background-color: #ffffff;
-    padding: 12px 20px 0 20px;
-  }
+}
+.pageheader {
+  padding: 0 20px;
+  height: 44px;
+  line-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.title {
+  font-size: 14px;
+}
+.content {
+  height: 90vh;
+  overflow-y: scroll;
+  scrollbar-width: none;
+}
+.form {
+  border: #f5f5f5 1px solid;
+  border-radius: 16px;
+  padding: 12px 20px 0 20px;
 }
 .avatar-uploader .avatar {
   width: 200px;

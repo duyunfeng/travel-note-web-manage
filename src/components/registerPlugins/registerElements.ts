@@ -1,4 +1,5 @@
 import 'element-plus/dist/index.css';
+import 'element-plus/theme-chalk/dark/css-vars.css'
 import {
   ElButton,
   ElMenu,
@@ -31,11 +32,16 @@ import {
   ElImage,
   ElPagination,
   ElLink,
-  ElTooltip
+  ElTooltip,
+  ElPopover,
+  ElTag,
+  ElBacktop,
+  ElStatistic,
+  ElDivider
 } from 'element-plus';
 import * as ElementPlusIconsVue from '@element-plus/icons-vue';
 
-const components = {
+const components:any = {
   ElButton,
   ElMenu,
   ElMenuItem,
@@ -67,7 +73,12 @@ const components = {
   ElImage,
   ElPagination,
   ElLink,
-  ElTooltip
+  ElTooltip,
+  ElPopover,
+  ElTag,
+  ElBacktop,
+  ElStatistic,
+  ElDivider
 };
 
 export const registerElements = (app: any) => {

@@ -6,11 +6,14 @@ import vueJsx from '@vitejs/plugin-vue-jsx';
 import vueDevTools from 'vite-plugin-vue-devtools';
 
 // https://vitejs.dev/config/
+const resolve = (dir:string):string => {
+  return fileURLToPath(new URL(`./${dir}`, import.meta.url))
+}
 export default defineConfig({
   plugins: [vue(), vueJsx(), vueDevTools()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': resolve('src'),
     }
   },
   server: {

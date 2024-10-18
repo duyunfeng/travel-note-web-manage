@@ -1,58 +1,63 @@
 import axios from 'axios';
-import { cookie } from '../utils/index';
+import { ElMessage } from 'element-plus';
+import { emitter } from '@/middleware/Emitter'
+import { useLoginStore } from '@/stores/login';
 
 const instance = axios.create({
-  baseURL: 'http://localhost:3000/api', //'http://localhost:8080/api',
+  baseURL: 'http://localhost:3000/api',  //'http://121.37.10.32:3000/api',
   timeout: 5000,
-  withCredentials: true
+  withCredentials: true,
 });
 
 instance.interceptors.response.use(
   (res: any) => {
+    if(res.data.code === 204) {
+      return undefined;
+    }
     return res.data;
   },
   (error) => {
-    return Promise.reject(error.response.data);
+    if(error.status === 401) {
+      ElMessage.error('登录超时，请重新登录')
+      emitter.emit('API:UN_AUTH');
+      return Promise.reject(error.response.data);
+    } else {
+      return Promise.reject(error.response.data);
+    }
+  }
+);
+
+instance.interceptors.request.use(
+  (config) => {
+    const { token } = useLoginStore()
+    if (config.url !== '/login') {
+      config.withCredentials = true;
+      config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      config.withCredentials = false;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
   }
 );
 
 const get = (url: string, params?: any) => {
   return instance.get(url, {
-    params: params,
-    headers: {
-      Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
-    }
+    params: params
   });
 };
 const post = (url: string, data: any) => {
-  const config: any = {
-    withCredentials: true
-  };
-  if (url !== '/login') {
-    config.withCredentials = true;
-    config.headers = {
-      Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
-    };
-  } else {
-    config.withCredentials = false;
-  }
-  return instance.post(url, data, config);
+  return instance.post(url, data);
 };
 
 const put = (url: string, data: any) => {
-  return instance.put(url, data, {
-    headers: {
-      Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
-    }
-  });
+  return instance.put(url, data);
 };
 
 const remove = (url: string) => {
-  return instance.delete(url, {
-    headers: {
-      Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
-    }
-  });
+  return instance.delete(url);
 };
 
 export { get, post, put, remove };

@@ -39,6 +39,9 @@
 .ml5 {
   margin-left: 5px;
 }
+.ml12 {
+  margin-left: 12px;
+}
 .ml15 {
   margin-left: 15px;
 }
@@ -65,4 +68,13 @@
 
 .fr {
   float: right;
+}
+
+.cursor {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.cursor:hover, .cursor:active {
+  cursor: pointer;
 }

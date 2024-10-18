@@ -46,7 +46,7 @@
   </el-drawer>
 </template>
 <script setup lang="ts">
-import { ref, reactive, defineProps, computed } from 'vue';
+import { ref, reactive, defineProps, computed, onMounted } from 'vue';
 import type { FormInstance, FormRules } from 'element-plus';
 const props = defineProps({
   isOpen: {
@@ -58,7 +58,10 @@ const props = defineProps({
     default: '创建用户'
   }
 });
-const modelIsOpen = computed(() => props.isOpen);
+const modelIsOpen = computed({
+  get: () => props.isOpen,
+  set: (val) => emit('update:isOpen', val)
+});
 const options = [
   { value: 'operator', label: '操作员' },
   { value: 'user', label: '普通用户' }
@@ -130,8 +133,8 @@ const confirmClick = () => {
   payload.isCreat = true;
   payload.form = form;
   emit('update:isOpen', payload);
-  if (props.isOpen) {
-    reset();
-  }
 };
+onMounted(() => {
+  reset();
+});
 </script>

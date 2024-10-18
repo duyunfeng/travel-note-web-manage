@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import { ElMessage } from 'element-plus';
 import type { UploadProps } from 'element-plus';
+import moment from 'moment';
 import { provinces } from '@/views/resources/provinces';
 import cookie from './cookie';
 const parsePx = (px: string | number) => (_.isNumber(px) ? `${px}px` : px);
@@ -14,13 +15,14 @@ const getProvincesOptions = () => {
 };
 
 const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  if (rawFile.type !== 'image/jpeg') {
-    ElMessage.error('Avatar picture must be JPG format!');
-    return false;
-  } else if (rawFile.size / 1024 / 1024 > 2) {
+  if (rawFile.size / 1024 / 1024 > 2) {
     ElMessage.error('Avatar picture size can not exceed 2MB!');
     return false;
   }
   return true;
 };
-export { cookie, parsePx, getProvincesOptions, beforeUpload };
+
+const setDarkMode = (isDark: boolean) => document.documentElement.classList.toggle('dark', isDark);
+
+const formatDate = (date: string | number | Date): string => moment(date).format('YYYY-MM-DD HH:mm:ss');
+export { cookie, parsePx, getProvincesOptions, beforeUpload, formatDate, setDarkMode };

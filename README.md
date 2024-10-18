@@ -37,3 +37,11 @@ npm run build
 ```sh
 npm run lint
 ```
+
+### node modules delete
+
+rimraf node_modules
+
+### todo
+
+1.修改密码2.黑暗模式动画3.黑暗模式下编辑文章4.文章查看5.首页相关数据6.浏览数据统计

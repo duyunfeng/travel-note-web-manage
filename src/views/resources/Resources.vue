@@ -27,73 +27,65 @@
           <el-col :span="24">
             <el-form-item>
               <el-link
+                v-if="false"
                 class="mr12"
-                href="http://localhost:3000/public/static/template/resource.xlsx"
+                href="http://121.37.10.32:3000/public/static/template/resource.xlsx"
                 :headers="{
-                  Authorization: `Bearer ${JSON.parse(cookie.get('token') || '')}`
+                  Authorization: `Bearer ${token}`
                 }"
                 target="_blank"
                 download
               >
                 <el-button type="primary">下载模板</el-button>
               </el-link>
-              <el-button type="primary" @click="importResources">批量导入</el-button>
+              <el-button v-if="false" type="primary" @click="importResources">批量导入</el-button>
               <el-button type="primary" @click="addResource">新增</el-button>
               <el-button type="primary" @click="getResource">查询</el-button>
+              <el-button type="primary" @click="reset">重置</el-button>
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
       <div class="table">
-        <el-table :data="tableData" border style="width: 100%" max-height="600">
-          <el-table-column fixed prop="name" label="名称" width="120" />
-          <el-table-column prop="id" label="Id" width="80" />
-          <el-table-column prop="img" label="封面" width="140">
-            <template #default="scope">
-              <div class="img-container">
-                <el-image
-                  class="img"
-                  preview-teleported
-                  :src="scope.row.img"
-                  :initial-index="scope.row.index"
-                  :zoom-rate="1.2"
-                  :max-scale="7"
-                  :min-scale="0.2"
-                  :preview-src-list="srcList"
-                  fit="contain"
-                />
-              </div>
-            </template>
-          </el-table-column>
-          <el-table-column prop="cityLabel" label="地址" width="120" />
-          <el-table-column prop="desc" v-if="type === 'food'" label="味道简介" width="120" />
-          <el-table-column prop="content" show-overflow-tooltip label="美食简介" width="120" />
-          <el-table-column prop="createTime" label="创建时间" width="120" />
-          <el-table-column prop="updateTime" label="更新时间" width="120" />
-          <el-table-column prop="creater" label="创建者" width="120" />
-          <el-table-column fixed="right" label="操作" min-width="200">
-            <template #default="table">
-              <el-button link type="primary" size="small" @click="editResource(table.row)"
-                >编辑</el-button
-              >
-              <el-button link type="primary" size="small" @click="viewOperationHistory(table.row)">
-                查看操作记录
-              </el-button>
-              <el-popconfirm title="确定删除资源吗？" @confirm="deleteResource(table.row)">
-                <template #reference>
-                  <el-button link type="primary" size="small">删除</el-button>
-                </template>
-              </el-popconfirm>
-            </template>
-          </el-table-column>
-        </el-table>
-        <div class="fr mt10 mb20">
-          <ElPaginationComponent
-            :currentPageNumber="pageData.currentPage"
-            :pageSizeNumber="pageData.pageSize"
-            :total="pageData.total"
-          />
-        </div>
+        <Table
+          :data="tableData"
+          :columns="columns"
+          :currentPageNumber="pageData.currentPage"
+          :pageSizeNumber="pageData.pageSize"
+          :total="pageData.total"
+          :paginationDirection="'right'"
+          @update:pageSizeNumber="handlePageData($event, 'pageSize')"
+          @update:currentPageNumber="handlePageData($event, 'currentPage')"
+        >
+          <template #img="scope">
+            <div class="img-container">
+              <el-image
+                class="img"
+                preview-teleported
+                :src="scope.scope.img"
+                :initial-index="scope.scope.index"
+                :zoom-rate="1.2"
+                :max-scale="7"
+                :min-scale="0.2"
+                :preview-src-list="srcList"
+                fit="contain"
+              />
+            </div>
+          </template>
+          <template #op="table">
+            <el-button link type="primary" size="small" @click="editResource(table.scope)"
+              >编辑</el-button
+            >
+            <el-button link type="primary" size="small" @click="viewOperationHistory(table.scope)">
+              查看操作记录
+            </el-button>
+            <el-popconfirm title="确定删除资源吗？" @confirm="deleteResource(table.scope)">
+              <template #reference>
+                <el-button link type="primary" size="small">删除</el-button>
+              </template>
+            </el-popconfirm>
+          </template>
+        </Table>
       </div>
     </div>
   </div>
@@ -107,15 +99,14 @@
   />
 </template>
 <script lang="ts" setup>
-import ElPaginationComponent from '@/components/ElPaginationComponent.vue';
-import Dialog from './Dialog.vue';
 import { ref, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { ElMessage } from 'element-plus';
 import { resources } from '@/services/index';
-import { getProvincesOptions } from '@/utils';
-import { cookie } from '@/utils/index';
+import { getProvincesOptions, formatDate } from '@/utils';
+import { useLoginStore } from '@/stores/login';
+import type { PageType } from '@/types';
 
+const { token } = useLoginStore();
 const tableData = ref([]);
 const router = useRouter();
 const route = useRoute();
@@ -125,7 +116,7 @@ const form = reactive({
   provinces: '',
   city: ''
 });
-const pageData = reactive({
+const pageData: PageType = reactive({
   currentPage: 1,
   pageSize: 10,
   total: 0
@@ -136,6 +127,84 @@ const opTableVisible = ref(false);
 const srcList: Array<any> = reactive([]);
 const provincesOptions = getProvincesOptions();
 const type = route.name === 'foodInformation' ? 'food' : 'site';
+const columns = ref([
+  {
+    prop: 'name',
+    label: '名称',
+    width: '120',
+    fixed: true,
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'id',
+    label: 'Id',
+    width: '80',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'img',
+    label: '封面',
+    width: '140',
+    isSlot: true,
+    show: true,
+    name: 'img',
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'cityLabel',
+    label: '地址',
+    width: '120',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'desc',
+    label: '味道简介',
+    width: '120',
+    show: type === 'food',
+    showOverflowTooltip: true
+  },
+  {
+    prop: 'content',
+    label: '美食简介',
+    width: '120',
+    show: true,
+    showOverflowTooltip: true
+  },
+  {
+    prop: 'createTime',
+    label: '创建时间',
+    width: '180',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'updateTime',
+    label: '更新时间',
+    width: '180',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    prop: 'creater',
+    label: '创建者',
+    width: '80',
+    show: true,
+    showOverflowTooltip: false
+  },
+  {
+    fixed: 'right',
+    label: '操作',
+    minWidth: '160',
+    isSlot: true,
+    show: true,
+    prop: 'op',
+    name: 'op',
+    showOverflowTooltip: false
+  }
+]);
 const addResource = () => {
   router.push({
     name: 'addResource',
@@ -149,14 +218,16 @@ const getResource = () => {
     name: form.name,
     id: form.id,
     city: form.city,
-    type: type
+    type: type,
+    page: pageData.currentPage,
+    pageSize: pageData.pageSize
   };
-  resources.getSource(params).then((res) => {
-    pageData.total = res.data.length;
+  resources.getSource(params).then((res: any) => {
+    pageData.total = res.total;
     tableData.value = res.data.map((item: any, key: number) => {
       item.index = key;
-      item.createTime = new Date(item.createTime);
-      item.updateTime = new Date(item.updateTime);
+      item.createTime = formatDate(new Date(item.createTime));
+      item.updateTime = formatDate(new Date(item.updateTime));
       item.cityLabel = provincesOptions.find((ele) => item.city === ele.value)?.label;
       item.img = `http://localhost:3000${item.img}`;
       srcList.push(item.img);
@@ -167,11 +238,8 @@ const getResource = () => {
 
 const importResources = () => {
   dialogVisible.value = true;
-  console.log('批量导入');
 };
 const editResource = (row: any) => {
-  console.log('编辑');
-  console.log(route.name, type, { ...row, type });
   router.push({
     name: 'addResource',
     params: { id: 'edit' },
@@ -183,25 +251,29 @@ const viewOperationHistory = (row: any) => {
     tableRow[key] = row[key];
   }
   opTableVisible.value = true;
-  console.log('查看操作记录');
 };
 const deleteResource = (row: any) => {
-  console.log('删除');
   resources.deleteSource(row.id).then((res) => {
-    console.log(res);
-    ElMessage.success('删除成功');
     getResource();
   });
+};
+const handlePageData = (val: number, type: keyof PageType) => {
+  pageData[type] = val;
+  getResource();
+};
+const reset = () => {
+  form.name = '';
+  form.id = '';
+  form.provinces = '';
+  pageData.currentPage = 1;
+  pageData.pageSize = 10;
+  getResource();
 };
 onMounted(() => {
   getResource();
 });
 </script>
 <style scoped>
-.content {
-  padding: 20px 20px 0;
-  height: 100%;
-}
 .demo-form-inline .el-input {
   --el-input-width: 220px;
 }
@@ -218,5 +290,12 @@ onMounted(() => {
   width: 100px;
   height: 100px;
   z-index: 999;
+}
+.table {
+  margin-bottom: 20px;
+}
+.el-tooltip__popper.is-dark {
+  max-width: 70vw;
+  margin: 0 auto;
 }
 </style>

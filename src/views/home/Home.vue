@@ -1,9 +1,11 @@
 <template>
   <el-menu class="el-menu-title" mode="horizontal" :ellipsis="false">
     <el-menu-item index="0">
-      <div><img class="logo" src="../../assets/logo.png" alt="Logo" /></div>
+      <div><img class="logo" src="@/assets/image/logo.png" alt="Logo" /></div>
     </el-menu-item>
-    <el-menu-item index="1">黑暗模式 <el-switch class="ml5" v-model="model" /></el-menu-item>
+    <el-menu-item index="1"
+      >黑暗模式 <el-switch class="ml5" v-model="model" @change="useDark"
+    /></el-menu-item>
     <el-sub-menu index="2">
       <template #title>{{ username }}</template>
       <el-menu-item
@@ -12,36 +14,21 @@
         :key="key"
         @click="userClick(key)"
       >
-        {{ item.name }}
+        {{ item.title }}
       </el-menu-item>
     </el-sub-menu>
   </el-menu>
   <el-row class="nav">
     <el-col :span="4" class="left">
       <el-menu class="el-menu-vertical" router @select="handleSelect" :default-active="activeKey">
-        <el-sub-menu index="1">
-          <template #title>
-            <el-icon :size="20"><location /></el-icon>
-            <span>Navigator One</span>
-          </template>
-          <el-menu-item-group title="Group One">
-            <el-menu-item index="1-1">item one</el-menu-item>
-            <el-menu-item index="1-2">item two</el-menu-item>
-          </el-menu-item-group>
-          <el-menu-item-group title="Group Two">
-            <el-menu-item index="1-3">item three</el-menu-item>
-          </el-menu-item-group>
-          <el-sub-menu index="1-4">
-            <template #title>item four</template>
-            <el-menu-item index="1-4-1">item one</el-menu-item>
-          </el-sub-menu>
-        </el-sub-menu>
-        <el-sub-menu index="2">
-          <template #title>
-            <el-icon :size="18"><Menu /></el-icon>
-            <span>Navigator Two</span>
-          </template>
-        </el-sub-menu>
+        <el-menu-item index="/homeView">
+          <el-icon :size="18"><House /></el-icon>
+          <span>首页</span>
+        </el-menu-item>
+        <el-menu-item index="articles">
+          <el-icon :size="18"><Menu /></el-icon>
+          <span>文章管理</span>
+        </el-menu-item>
         <el-sub-menu index="3">
           <template #title>
             <el-icon :size="18"><document /></el-icon>
@@ -75,41 +62,52 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { cookie } from '@/utils';
+import { emitter } from '@/middleware/Emitter';
+import { useUserStore } from '@/stores/user';
+import { setDarkMode } from '@/utils';
 
-const router = useRouter();
+const { userInfo, changeDark, isDark } = useUserStore();
 const route = useRoute();
+const router = useRouter();
+const model = ref(isDark);
 let activeKey = ref('/');
 onMounted(() => {
   activeKey.value = route.name as string;
+  username.value = userInfo.userName || '';
   handleSelect(activeKey.value);
 });
-const model = ref(false);
 const username = ref('管理员');
 const getIndex = (key: number) => `2-${key + 1}`;
 
 const menus = ref([
-  { name: '个人中心', path: '/user' },
-  { name: '密码修改', path: '/role' },
-  { name: '系统设置', path: '/setting' },
-  { name: '退出登录', path: '/logout' }
+  { title: '个人中心', path: '/personal', name: 'personal' },
+  { title: '退出登录', path: '/logout', name: 'logout' }
 ]);
 const pageHeaderTitle = ref('首页');
 const userClick = (key: number) => {
-  if (key === 3) {
-    localStorage.setItem('isAuthenticated', 'false');
-    cookie.remove('token');
-    router.push('/login');
+  if (key === 1) {
+    emitter.emit('ROUTER:LOGOUT');
+  } else {
+    const name = menus.value[key].name;
+    activeKey.value = name;
+    handleSelect(name);
+    router.push(menus.value[key].path);
   }
 };
-const handleSelect = (key: string) => {
+const useDark = (val: boolean) => {
+  setDarkMode(val);
+  changeDark(val);
+};
+const handleSelect = (name: string) => {
+  activeKey.value = name;
   const options: any = {
     foodInformation: '美食资料',
     siteInformation: '景点历史',
     user: '用户管理',
-    personal: '个人中心'
+    personal: '个人中心',
+    articles: '文章管理'
   };
-  pageHeaderTitle.value = options[key] || '首页';
+  pageHeaderTitle.value = options[name] || '首页';
 };
 </script>
 <style scoped>
@@ -132,7 +130,7 @@ const handleSelect = (key: string) => {
   border: 3px solid #2c3142;
 }
 .left {
-  min-width: 200px;
+  min-width: 150px;
   top: 60px;
   position: relative;
 }
@@ -142,18 +140,17 @@ const handleSelect = (key: string) => {
 .right {
   position: relative;
   top: 60px;
-  padding: 20px;
+  padding: 5px 5px 10px 5px;
   height: 100%;
   max-width: calc(100% - 200px);
-
   overflow-y: scroll;
   scrollbar-width: none;
 }
 .border {
   border-radius: 16px;
+  height: 100%;
 }
 .nav {
   height: calc(100vh - 60px);
-  margin-bottom: 20px;
 }
 </style>
