@@ -48,6 +48,9 @@
           @update:pageSizeNumber="handlePageData($event, 'pageSize')"
           @update:currentPageNumber="handlePageData($event, 'currentPage')"
         >
+          <template #status="scope">
+            <el-tag :type="scope.scope.statusType">{{ scope.scope.statusLabel }}</el-tag>
+          </template>
           <template #op="scope">
             <el-button
               v-if="scope.scope.status !== 1"
@@ -100,7 +103,7 @@ import { ref, reactive, onMounted } from 'vue';
 import { user } from '../../services/index';
 import { ElMessage } from 'element-plus';
 import { formatDate } from '@/utils';
-import type { PageType } from '@/types';
+import type { PageType, StatusTagType } from '@/types';
 
 const form = reactive({ userName: '', name: '', status: '', id: '' });
 const isOpen = ref(false);
@@ -143,10 +146,12 @@ const columns = ref([
   },
 
   {
-    prop: 'statusLabel',
+    prop: 'status',
     label: '审核状态',
     width: '120',
     show: true,
+    isSlot: true,
+    name: 'status',
     showOverflowTooltip: true
   },
   {
@@ -215,6 +220,12 @@ const getUser = () => {
     (res) => {
       tableData.value = res.data.map((item: any) => {
         const statusArr = ['未审核', '已审核', '已拒绝'];
+        const objectType: StatusTagType = {
+          0: 'info',
+          1: 'success',
+          2: 'danger',
+          3: 'warning'
+        };
         const userRole: { [key: string]: string } = {
           admin: '管理员',
           operator: '审核员',
@@ -223,6 +234,7 @@ const getUser = () => {
         return {
           ...item,
           role: userRole[item.role],
+          statusType: objectType[item.status as keyof StatusTagType],
           statusLabel: statusArr[item.status],
           createTime: formatDate(new Date(item.createTime)),
           updateTime: formatDate(new Date(item.updateTime))

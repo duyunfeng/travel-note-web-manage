@@ -40,8 +40,8 @@
           <span><IconSvg :name="'shoucang'" /><span class="cursor">50</span></span>
           <span><IconSvg :name="'pinglun'" /><span class="cursor">200</span></span>
         </div>
+        <el-backtop target=".article-content" right="10" bottom="70" />
       </div>
-      <el-backtop target=".article-content" :right="220" :bottom="160" />
     </div>
   </div>
 </template>
@@ -147,5 +147,6 @@ onMounted(() => {
   transform: translate(-50%, -50%);
   border-radius: 0 0 25px 25px;
   border: 1px solid #f5f5f5;
+  background-color: #ffffff;
 }
 </style>

@@ -47,7 +47,7 @@
               />
             </div>
           </template>
-          <template #default="scope">
+          <template #status="scope">
             <el-tag :type="scope.scope.statusType">{{ scope.scope.statusLabel }}</el-tag>
           </template>
           <template #op="table">
@@ -158,6 +158,15 @@ const columns = ref([
     width: '120',
     show: true,
     showOverflowTooltip: true
+  },
+  {
+    prop: 'status',
+    label: '状态',
+    width: '80',
+    isSlot: true,
+    show: true,
+    name: 'status',
+    showOverflowTooltip: false
   },
   {
     prop: 'createTime',
